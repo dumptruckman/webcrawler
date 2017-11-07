@@ -6,9 +6,6 @@ import java.net.URI;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.DosFileAttributes;
-import java.nio.file.attribute.FileAttribute;
-import java.nio.file.attribute.FileTime;
 import java.nio.file.attribute.PosixFilePermissions;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -78,89 +75,9 @@ class WebCrawlerTest {
 
     @Test
     public void testVerifyValidDownloadRepositoryNonWritableDirectoryThrowsIAE() throws Exception {
-        Path p;
         if (FileSystems.getDefault().supportedFileAttributeViews().contains("posix")) {
-            p = Files.createTempDirectory("tmp", PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("r-xr-x---")));
-        } else {
-            FileAttribute<DosFileAttributes> attrib = new FileAttribute<DosFileAttributes>() {
-                @Override
-                public String name() {
-                    return "readonly";
-                }
-
-                @Override
-                public DosFileAttributes value() {
-                    return new DosFileAttributes() {
-                        @Override
-                        public boolean isReadOnly() {
-                            return true;
-                        }
-
-                        @Override
-                        public boolean isHidden() {
-                            return false;
-                        }
-
-                        @Override
-                        public boolean isArchive() {
-                            return false;
-                        }
-
-                        @Override
-                        public boolean isSystem() {
-                            return false;
-                        }
-
-                        @Override
-                        public FileTime lastModifiedTime() {
-                            return FileTime.fromMillis(0);
-                        }
-
-                        @Override
-                        public FileTime lastAccessTime() {
-                            return FileTime.fromMillis(0);
-                        }
-
-                        @Override
-                        public FileTime creationTime() {
-                            return FileTime.fromMillis(0);
-                        }
-
-                        @Override
-                        public boolean isRegularFile() {
-                            return false;
-                        }
-
-                        @Override
-                        public boolean isDirectory() {
-                            return true;
-                        }
-
-                        @Override
-                        public boolean isSymbolicLink() {
-                            return false;
-                        }
-
-                        @Override
-                        public boolean isOther() {
-                            return false;
-                        }
-
-                        @Override
-                        public long size() {
-                            return 1024;
-                        }
-
-                        @Override
-                        public Object fileKey() {
-                            return null;
-                        }
-                    };
-                }
-            };
-
-            p = Files.createTempDirectory("tmp", attrib);
+            Path p = Files.createTempDirectory("tmp", PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("r-xr-x---")));
+            assertThrows(IllegalArgumentException.class, () -> WebCrawler.verifyValidDownloadRepository(p));
         }
-        assertThrows(IllegalArgumentException.class, () -> WebCrawler.verifyValidDownloadRepository(p));
     }
 }
