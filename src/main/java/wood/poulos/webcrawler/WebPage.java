@@ -83,6 +83,6 @@ public class WebPage implements WebElement {
     /** {@inheritDoc} */
     @Override
     public void save(@NotNull URI uri) {
-
+        throw new UnsupportedOperationException("page doesn't support save");
     }
 }
