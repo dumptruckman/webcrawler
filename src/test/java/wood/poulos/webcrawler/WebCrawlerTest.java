@@ -82,7 +82,7 @@ class WebCrawlerTest {
         if (FileSystems.getDefault().supportedFileAttributeViews().contains("posix")) {
             p = Files.createTempDirectory("tmp", PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("r-xr-x---")));
         } else {
-            FileAttribute<DosFileAttributes> attrib = new FileAttribute<>() {
+            FileAttribute<DosFileAttributes> attrib = new FileAttribute<DosFileAttributes>() {
                 @Override
                 public String name() {
                     return "readonly";
