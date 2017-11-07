@@ -56,7 +56,7 @@ public class WebCrawler {
         return repository;
     }
 
-    private static void verifySufficientArgCount(@NotNull String[] args) {
+    static void verifySufficientArgCount(@NotNull String[] args) {
         if (args.length < 1) {
             throw new IllegalArgumentException("A web address must be specified as the first argument.");
         } else if (args.length < 2) {
@@ -67,7 +67,7 @@ public class WebCrawler {
     }
 
     @NotNull
-    private static URI getValidURI(@NotNull String arg) {
+    static URI getValidURI(@NotNull String arg) {
         try {
             return URI.create(arg);
         } catch (IllegalArgumentException ignore) {
@@ -75,7 +75,7 @@ public class WebCrawler {
         }
     }
 
-    private static int getValidMaxDepth(@NotNull String arg) {
+    static int getValidMaxDepth(@NotNull String arg) {
         try {
             int maxDepth = Integer.parseInt(arg);
             if (maxDepth < 1) {
@@ -88,7 +88,7 @@ public class WebCrawler {
     }
 
     @NotNull
-    private static WebElementRepository getValidDownloadRepository(@NotNull String arg) {
+    static WebElementRepository getValidDownloadRepository(@NotNull String arg) {
         try {
             Path localPath = Paths.get(arg);
             verifyValidDownloadRepository(localPath);
@@ -99,7 +99,7 @@ public class WebCrawler {
         }
     }
 
-    private static void verifyValidDownloadRepository(@NotNull Path path) {
+    static void verifyValidDownloadRepository(@NotNull Path path) {
         if (isNonDirectory(path)) {
             throw new IllegalArgumentException("The local directory (3rd arg) must be a directory or non-existent.");
         }
@@ -108,7 +108,7 @@ public class WebCrawler {
         }
     }
 
-    private static boolean isNonDirectory(@NotNull Path path) {
+    static boolean isNonDirectory(@NotNull Path path) {
         return Files.exists(path) && !Files.isDirectory(path);
     }
 }
