@@ -46,7 +46,14 @@ enum DownloadRepository implements WebElementRepository {
     /** {@inheritDoc} */
     @Override
     @NotNull
-    public Iterable<WebElement> getElements() {
+    public Iterable<WebElement> getStagedElements() {
         return null;
     }
+
+    /** {@inheritDoc} */
+    @Override
+    public void commit() {
+
+    }
+
 }
