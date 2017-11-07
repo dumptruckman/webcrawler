@@ -10,7 +10,8 @@ class WebPageTest {
 
     @Test
     void testSaveThrowsUnsupportedOperationException() {
-        assertThrows(UnsupportedOperationException.class, () -> new WebPage().save(URI.create("")));
+        assertThrows(UnsupportedOperationException.class,
+                () -> WebElements.createWebPage(URI.create("file://.").toURL()).save(URI.create("")));
     }
 
 }
