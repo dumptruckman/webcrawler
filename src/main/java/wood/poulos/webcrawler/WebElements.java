@@ -28,7 +28,8 @@ class WebElements {
      */
     @NotNull
     static WebImage createWebImage(@NotNull URL url) {
-        return null;
+        WebImage webImage = new WebImage(url);
+        return webImage;
     }
 
     /**

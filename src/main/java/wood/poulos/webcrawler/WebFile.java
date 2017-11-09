@@ -1,7 +1,9 @@
 package wood.poulos.webcrawler;
 
 import org.jetbrains.annotations.NotNull;
+import wood.poulos.webcrawler.util.ElementCopier;
 
+import java.io.IOException;
 import java.net.URL;
 
 /**
@@ -20,6 +22,10 @@ public class WebFile implements WebElement {
      * @param saveLocation*/
     @Override
     public void save(URL saveLocation) {
-
+        try {
+            ElementCopier.copyElement(getURL(),saveLocation);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
