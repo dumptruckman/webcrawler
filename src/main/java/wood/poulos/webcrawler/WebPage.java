@@ -9,7 +9,11 @@ import java.util.Iterator;
 /**
  * A abstract representation of a web page.
  */
-public class WebPage implements WebElement {
+public class WebPage extends AbstractWebElement implements WebElement {
+
+    public WebPage(URL url) {
+        super(url);
+    }
 
     /**
      * Parses the concrete web page this WebPage represents and identifies all of its files, images, and links to other
@@ -70,13 +74,6 @@ public class WebPage implements WebElement {
      */
     @NotNull
     public Iterator<WebPage> getWebPages() {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @NotNull
-    @Override
-    public URL getURL() {
         return null;
     }
 

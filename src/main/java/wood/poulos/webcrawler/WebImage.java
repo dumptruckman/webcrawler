@@ -10,29 +10,9 @@ import java.nio.file.Path;
 /**
  * A abstract representation of a image on the web.
  */
-public class WebImage implements WebElement {
+public class WebImage extends AbstractWebElement implements WebElement {
 
-    private final URL url;
-
-    WebImage(URL url) {
-        this.url = url;
-    }
-
-    /** {@inheritDoc} */
-    @NotNull
-    @Override
-    public URL getURL() {
-        return url;
-    }
-
-    /** {@inheritDoc}
-     * @param saveLocation*/
-    @Override
-    public void save(Path saveLocation) {
-        try {
-            ElementCopier.copyElement(getURL(),saveLocation);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public WebImage(URL url) {
+        super(url);
     }
 }

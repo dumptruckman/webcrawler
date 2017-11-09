@@ -17,7 +17,8 @@ class WebElements {
      */
     @NotNull
     static WebPage createWebPage(@NotNull URL url) {
-        return null;
+        WebPage webPage = new WebPage(url);
+        return webPage;
     }
 
     /**

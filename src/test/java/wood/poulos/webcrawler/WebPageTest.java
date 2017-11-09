@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class WebPageTest {
 
     @Test
-    void testSaveThrowsUnsupportedOperationException() {
+    void testSaveThrowsUnsupportedOperationException() throws Exception {
         assertThrows(UnsupportedOperationException.class,
                 () -> WebElements.createWebPage(URI.create("file://.").toURL()).save(Paths.get("./temp.html")));
     }
