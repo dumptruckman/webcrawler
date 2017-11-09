@@ -38,7 +38,7 @@ class LocalFileRepositoryTest {
 
     @BeforeEach
     void setup() throws Exception {
-        repo = new DefaultLocalFileRepository(Files.createTempDirectory("./tmp"));
+        repo = new DefaultLocalFileRepository(Files.createTempDirectory("."));
         elements = getStagedElements();
     }
 
@@ -58,7 +58,7 @@ class LocalFileRepositoryTest {
     @Test
     void testAddElementsMakeGetStagedElementsNonEmpty() throws Exception {
         repo.addElement(WebElements.createWebPage(URI.create("file://./test.index").toURL()));
-        assertFalse(elements.isEmpty());
+        assertFalse(getStagedElements().isEmpty());
     }
 
     @Test
