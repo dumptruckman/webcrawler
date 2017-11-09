@@ -1,6 +1,7 @@
 package wood.poulos.webcrawler;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.net.URI;
 import java.net.URL;
@@ -27,4 +28,17 @@ public interface WebElement {
      * @param uri The resource to save the element to.
      */
     void save(@NotNull URI uri);
+
+    /**
+     * Determines if this WebElement is equivalent to the given other object.
+     * <p>
+     *     A WebElement is only ever equivalent to other WebElements and only when their URLs are equivalent.
+     * </p>
+     *
+     * @param other The object to test equality against.
+     * @return True iff the given other object is a WebElement and produces a URL from {@link #getURL()} equivalent to
+     * the URL for this WebElement.
+     */
+    @Override
+    boolean equals(@Nullable Object other);
 }
