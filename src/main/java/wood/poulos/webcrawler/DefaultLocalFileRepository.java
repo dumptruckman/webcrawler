@@ -9,8 +9,8 @@ class DefaultLocalFileRepository implements LocalFileRepository {
 
     /** {@inheritDoc} */
     @Override
-    public void setLocalFileLocation(Path path) {
-
+    public Path getLocalDirectory() {
+        return null;
     }
 
     /** {@inheritDoc} */

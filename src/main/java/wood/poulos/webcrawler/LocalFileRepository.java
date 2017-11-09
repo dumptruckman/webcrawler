@@ -8,11 +8,11 @@ import java.nio.file.Path;
 interface LocalFileRepository extends WebElementRepository {
 
     /**
-     * Sets the download location for this repository.
+     * Returns the local directory files in this repository will be committed to.
      *
-     * @param path The path where files will be downloaded to.
+     * @return The local directory files in this repository will be committed to.
      */
-    void setLocalFileLocation(Path path);
+    Path getLocalDirectory();
 
     /**
      * Retrieves the path on the local disk for the given element.
