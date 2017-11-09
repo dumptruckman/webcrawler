@@ -1,6 +1,7 @@
 package wood.poulos.webcrawler;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import wood.poulos.webcrawler.util.ElementCopier;
 
 import java.io.IOException;
@@ -18,21 +19,42 @@ abstract class AbstractWebElement implements WebElement {
         this.url = url;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @NotNull
     @Override
     public final URL getURL() {
         return url;
     }
 
-    /** {@inheritDoc}
-     * @param saveLocation*/
+    /**
+     * {@inheritDoc}
+     *
+     * @param saveLocation
+     */
     @Override
     public void save(Path saveLocation) {
         try {
-            ElementCopier.copyElement(getURL(),saveLocation);
+            ElementCopier.copyElement(getURL(), saveLocation);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public int hashCode() {
+        return getURL().hashCode();
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (this == obj)
+            return true;
+
+        if (!(obj instanceof WebElement))
+            return false;
+        WebElement other = (WebElement) obj;
+        return other.getURL().equals(this.getURL());
     }
 }

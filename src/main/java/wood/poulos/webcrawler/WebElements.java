@@ -41,6 +41,6 @@ class WebElements {
      */
     @NotNull
     static WebFile createWebFile(@NotNull URL url) {
-        return null;
+        return new WebFile(url);
     }
 }
