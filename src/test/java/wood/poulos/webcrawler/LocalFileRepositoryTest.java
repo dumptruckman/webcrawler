@@ -15,7 +15,7 @@ import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class DownloadRepositoryTest {
+class LocalFileRepositoryTest {
 
     private static final WebElement RELIABLE_IMAGE;
 
@@ -31,12 +31,13 @@ class DownloadRepositoryTest {
         }
     }
 
-    private DownloadRepository repo = DownloadRepository.INSTANCE;
+    private LocalFileRepository repo;
 
     private Collection<WebElement> elements;
 
     @BeforeEach
     void setup() {
+        repo = new DefaultLocalFileRepository();
         elements = getStagedElements();
     }
 
@@ -75,7 +76,7 @@ class DownloadRepositoryTest {
         WebElement element = RELIABLE_IMAGE;
         repo.addElement(element);
         Path currentDirectory = Paths.get(".");
-        repo.setDownloadLocation(currentDirectory);
+        repo.setLocalFileLocation(currentDirectory);
         Path expectedPath = currentDirectory.resolve(URLConverter.convertToFilePath(element.getURL()));
         assertEquals(expectedPath, repo.getLocalPathForElement(element));
     }
