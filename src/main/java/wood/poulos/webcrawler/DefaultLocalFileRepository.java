@@ -2,6 +2,7 @@ package wood.poulos.webcrawler;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import wood.poulos.webcrawler.util.URLConverter;
 
 import java.nio.file.Path;
 
@@ -23,7 +24,7 @@ class DefaultLocalFileRepository implements LocalFileRepository {
     @Nullable
     @Override
     public Path getLocalPathForElement(@NotNull WebElement element) {
-        return null;
+        return getLocalDirectory().resolve(URLConverter.convertToFilePath(element.getURL()));
     }
 
     /** {@inheritDoc} */

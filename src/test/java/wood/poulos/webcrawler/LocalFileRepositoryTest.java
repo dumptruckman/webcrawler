@@ -8,6 +8,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -36,8 +37,8 @@ class LocalFileRepositoryTest {
     private Collection<WebElement> elements;
 
     @BeforeEach
-    void setup() {
-        repo = new DefaultLocalFileRepository();
+    void setup() throws Exception {
+        repo = new DefaultLocalFileRepository(Files.createTempDirectory("./tmp"));
         elements = getStagedElements();
     }
 
@@ -73,10 +74,10 @@ class LocalFileRepositoryTest {
 
     @Test
     void testGetLocalPathForElementWhenDownloadLocationSetToCurrentDirectory() throws Exception {
+        repo = new DefaultLocalFileRepository(Paths.get("."));
         WebElement element = RELIABLE_IMAGE;
         repo.addElement(element);
         Path currentDirectory = Paths.get(".");
-        repo.setLocalFileLocation(currentDirectory);
         Path expectedPath = currentDirectory.resolve(URLConverter.convertToFilePath(element.getURL()));
         assertEquals(expectedPath, repo.getLocalPathForElement(element));
     }

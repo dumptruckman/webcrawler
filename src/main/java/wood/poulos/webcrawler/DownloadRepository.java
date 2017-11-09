@@ -2,8 +2,10 @@ package wood.poulos.webcrawler;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import wood.poulos.webcrawler.util.URLConverter;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * A repository of web elements that downloads the elements as it
@@ -11,13 +13,19 @@ import java.nio.file.Path;
 enum DownloadRepository implements WebElementRepository {
     INSTANCE;
 
+    LocalFileRepository localRepo = new DefaultLocalFileRepository(Paths.get("."));
+
     /**
      * Sets the download location for this repository.
      *
      * @param path The path where files will be downloaded to.
      */
     void setDownloadLocation(Path path) {
-        
+        LocalFileRepository newLocalRepo = new DefaultLocalFileRepository(path);
+        for (WebElement e : getStagedElements()) {
+            newLocalRepo.addElement(e);
+        }
+        localRepo = newLocalRepo;
     }
 
     /**
@@ -28,32 +36,40 @@ enum DownloadRepository implements WebElementRepository {
      */
     @Nullable
     Path getLocalPathForElement(@NotNull WebElement element) {
-        return null;
+        return localRepo.getLocalPathForElement(element);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void addElement(@NotNull WebElement element) {
-
+        localRepo.addElement(element);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void removeElement(@NotNull WebElement element) {
-
+        localRepo.removeElement(element);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @NotNull
     public Iterable<WebElement> getStagedElements() {
-        return null;
+        return localRepo.getStagedElements();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void commit() {
-
+        localRepo.commit();
     }
 
 }
