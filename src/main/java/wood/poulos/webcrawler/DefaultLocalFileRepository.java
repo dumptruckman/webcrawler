@@ -8,12 +8,13 @@ import java.nio.file.Path;
 class DefaultLocalFileRepository implements LocalFileRepository {
     private final Path localPath;
 
-    public DefaultLocalFileRepository(Path localPath) {
+    DefaultLocalFileRepository(Path localPath) {
         this.localPath = localPath;
     }
 
     /** {@inheritDoc} */
     @Override
+    @NotNull
     public Path getLocalDirectory() {
         return null;
     }

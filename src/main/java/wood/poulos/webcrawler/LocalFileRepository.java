@@ -12,6 +12,7 @@ interface LocalFileRepository extends WebElementRepository {
      *
      * @return The local directory files in this repository will be committed to.
      */
+    @NotNull
     Path getLocalDirectory();
 
     /**
