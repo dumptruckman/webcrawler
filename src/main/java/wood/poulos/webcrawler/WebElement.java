@@ -3,7 +3,6 @@ package wood.poulos.webcrawler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.net.URI;
 import java.net.URL;
 
 /**
@@ -25,9 +24,9 @@ public interface WebElement {
      *     The saved format of the element should exactly represent the element as served on the web.
      * </p>
      *
-     * @param uri The resource to save the element to.
+     * @param saveLocation The resource to save the element to.
      */
-    void save(@NotNull URI uri);
+    void save(URL saveLocation);
 
     /**
      * Determines if this WebElement is equivalent to the given other object.

@@ -2,7 +2,6 @@ package wood.poulos.webcrawler;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.net.URI;
 import java.net.URL;
 import java.util.Iterator;
 
@@ -80,9 +79,10 @@ public class WebPage implements WebElement {
         return null;
     }
 
-    /** {@inheritDoc} */
+    /** {@inheritDoc}
+     * @param saveLocation*/
     @Override
-    public void save(@NotNull URI uri) {
+    public void save(URL saveLocation) {
         throw new UnsupportedOperationException("page doesn't support save");
     }
 }
