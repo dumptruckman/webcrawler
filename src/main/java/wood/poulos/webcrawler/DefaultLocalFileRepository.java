@@ -6,6 +6,11 @@ import org.jetbrains.annotations.Nullable;
 import java.nio.file.Path;
 
 class DefaultLocalFileRepository implements LocalFileRepository {
+    private final Path localPath;
+
+    public DefaultLocalFileRepository(Path localPath) {
+        this.localPath = localPath;
+    }
 
     /** {@inheritDoc} */
     @Override
