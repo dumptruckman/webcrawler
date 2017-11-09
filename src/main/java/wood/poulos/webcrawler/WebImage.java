@@ -5,6 +5,7 @@ import wood.poulos.webcrawler.util.ElementCopier;
 
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Path;
 
 /**
  * A abstract representation of a image on the web.
@@ -27,7 +28,7 @@ public class WebImage implements WebElement {
     /** {@inheritDoc}
      * @param saveLocation*/
     @Override
-    public void save(URL saveLocation) {
+    public void save(Path saveLocation) {
         try {
             ElementCopier.copyElement(getURL(),saveLocation);
         } catch (IOException e) {

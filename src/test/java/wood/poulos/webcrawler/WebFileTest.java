@@ -16,7 +16,7 @@ class WebFileTest {
         WebElement file = WebElements.createWebImage(URLCreator.create("file:./testPages/text_files/text_file_1.txt"));
         File originalFile = new File("./testPages/text_files/text_file_1.txt");
         File tempFile = Files.createTempFile("text_file_1", ".txt").toFile();
-        file.save(tempFile.toURI().toURL());
+        file.save(tempFile.toPath());
         assertTrue(FileUtils.contentEqualsIgnoreEOL(originalFile, tempFile, null));
     }
 

@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.net.URL;
+import java.nio.file.Path;
 
 /**
  * An abstract representation of some element of the web.
@@ -24,9 +25,9 @@ public interface WebElement {
      *     The saved format of the element should exactly represent the element as served on the web.
      * </p>
      *
-     * @param saveLocation The resource to save the element to.
+     * @param saveLocation The path to save the element to.
      */
-    void save(URL saveLocation);
+    void save(Path saveLocation);
 
     /**
      * Determines if this WebElement is equivalent to the given other object.

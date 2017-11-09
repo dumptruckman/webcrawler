@@ -16,7 +16,7 @@ class WebImageTest {
         WebElement image = WebElements.createWebImage(URLCreator.create("file:./testPages/images/image1.png"));
         File originalFile = new File("./testPages/images/image1.png");
         File tempFile = Files.createTempFile("image1", ".png").toFile();
-        image.save(tempFile.toURI().toURL());
+        image.save(tempFile.toPath());
         assertTrue(FileUtils.contentEqualsIgnoreEOL(originalFile, tempFile, null));
     }
 
