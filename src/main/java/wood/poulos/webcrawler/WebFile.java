@@ -10,23 +10,8 @@ import java.nio.file.Path;
 /**
  * A abstract representation of a file on the web.
  */
-public class WebFile implements WebElement {
-
-    /** {@inheritDoc} */
-    @NotNull
-    @Override
-    public URL getURL() {
-        return null;
-    }
-
-    /** {@inheritDoc}
-     * @param saveLocation*/
-    @Override
-    public void save(Path saveLocation) {
-        try {
-            ElementCopier.copyElement(getURL(),saveLocation);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+public class WebFile extends AbstractWebElement implements WebElement {
+    public WebFile(URL url) {
+        super(url);
     }
 }

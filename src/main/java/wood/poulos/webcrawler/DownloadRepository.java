@@ -17,7 +17,7 @@ enum DownloadRepository implements WebElementRepository {
      * @param path The path where files will be downloaded to.
      */
     void setDownloadLocation(Path path) {
-
+        
     }
 
     /**
