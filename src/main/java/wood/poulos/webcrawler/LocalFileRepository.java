@@ -23,21 +23,4 @@ interface LocalFileRepository extends WebElementRepository {
      */
     @Nullable
     Path getLocalPathForElement(@NotNull WebElement element);
-
-    /** {@inheritDoc} */
-    @Override
-    public void addElement(@NotNull WebElement element);
-
-    /** {@inheritDoc} */
-    @Override
-    public void removeElement(@NotNull WebElement element);
-
-    /** {@inheritDoc} */
-    @Override
-    @NotNull
-    public Iterable<WebElement> getStagedElements();
-
-    /** {@inheritDoc} */
-    @Override
-    public void commit();
 }
