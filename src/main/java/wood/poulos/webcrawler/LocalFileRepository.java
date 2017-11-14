@@ -8,28 +8,31 @@ import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 
-class DefaultLocalFileRepository implements LocalFileRepository {
+public class LocalFileRepository implements WebElementRepository {
     private final Path localPath;
     private final Set<WebElement> stagedElements = new HashSet<>();
 
-    DefaultLocalFileRepository(Path localPath) {
+    LocalFileRepository(Path localPath) {
         this.localPath = localPath;
     }
 
     /**
-     * {@inheritDoc}
+     * Returns the local directory files in this repository will be committed to.
+     *
+     * @return The local directory files in this repository will be committed to.
      */
-    @Override
     @NotNull
     public Path getLocalDirectory() {
         return localPath;
     }
 
     /**
-     * {@inheritDoc}
+     * Retrieves the path on the local disk for the given element.
+     *
+     * @param element The element to get the path for.
+     * @return The local path for the given element or null if the element is not contained within this repository.
      */
     @Nullable
-    @Override
     public Path getLocalPathForElement(@NotNull WebElement element) {
         return getLocalDirectory().resolve(URLConverter.convertToFilePath(element.getURL()));
     }
