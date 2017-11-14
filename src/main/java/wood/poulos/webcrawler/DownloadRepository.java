@@ -2,7 +2,6 @@ package wood.poulos.webcrawler;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import wood.poulos.webcrawler.util.URLConverter;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -13,7 +12,7 @@ import java.nio.file.Paths;
 enum DownloadRepository implements WebElementRepository {
     INSTANCE;
 
-    LocalFileRepository localRepo = new DefaultLocalFileRepository(Paths.get("."));
+    LocalFileRepository localRepo = new LocalFileRepository(Paths.get("."));
 
     /**
      * Sets the download location for this repository.
@@ -21,7 +20,7 @@ enum DownloadRepository implements WebElementRepository {
      * @param path The path where files will be downloaded to.
      */
     void setDownloadLocation(Path path) {
-        LocalFileRepository newLocalRepo = new DefaultLocalFileRepository(path);
+        LocalFileRepository newLocalRepo = new LocalFileRepository(path);
         for (WebElement e : getStagedElements()) {
             newLocalRepo.addElement(e);
         }
