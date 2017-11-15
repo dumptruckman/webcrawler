@@ -13,7 +13,7 @@ import java.nio.file.Path;
 /**
  * A utility for copying the contents of a URL to a file path.
  */
-public class ElementCopier {
+public class URLDownloader {
 
     /**
      * Copies the contents of a URL to a location on disc as given by a path.

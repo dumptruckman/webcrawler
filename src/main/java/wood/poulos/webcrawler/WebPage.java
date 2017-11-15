@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.net.URL;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.Iterator;
 
 /**
@@ -39,41 +40,32 @@ public class WebPage extends AbstractWebElement implements WebElement {
     }
 
     /**
-     * Returns a new iterator for the images located on this page.
-     * <p>
-     *     An iterator is used here in order to allow lazy resolution of the images.
-     * </p>
+     * Returns an unmodifiable collection of the images located on this page.
      *
-     * @return a new iterator for the images located on this page.
+     * @return an unmodifiable collection of the images located on this page.
      */
     @NotNull
-    public Iterator<WebImage> getImages() {
+    public Collection<WebImage> getImages() {
         return null;
     }
 
     /**
-     * Returns a new iterator for the files located on this page.
-     * <p>
-     *     An iterator is used here in order to allow lazy resolution of the files.
-     * </p>
+     * Returns an unmodifiable collection of the files located on this page.
      *
-     * @return a new iterator for the files located on this page.
+     * @return an unmodifiable collection of the files located on this page.
      */
     @NotNull
-    public Iterator<WebFile> getFiles() {
+    public Collection<WebFile> getFiles() {
         return null;
     }
 
     /**
-     * Returns a new iterator for the links to other web pages located on this page.
-     * <p>
-     *     An iterator is used here in order to allow lazy resolution of the pages.
-     * </p>
+     * Returns an unmodifiable collection of the links to other web pages located on this page.
      *
-     * @return a new iterator for the links to other web pages located on this page.
+     * @return an unmodifiable collection of the links to other web pages located on this page.
      */
     @NotNull
-    public Iterator<WebPage> getWebPages() {
+    public Collection<WebPage> getWebPages() {
         return null;
     }
 

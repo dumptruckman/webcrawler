@@ -2,7 +2,7 @@ package wood.poulos.webcrawler;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import wood.poulos.webcrawler.util.ElementCopier;
+import wood.poulos.webcrawler.util.URLDownloader;
 
 import java.io.IOException;
 import java.net.URL;
@@ -36,7 +36,7 @@ abstract class AbstractWebElement implements WebElement {
     @Override
     public void save(Path saveLocation) {
         try {
-            ElementCopier.copyElement(getURL(), saveLocation);
+            URLDownloader.copyElement(getURL(), saveLocation);
         } catch (IOException e) {
             e.printStackTrace();
         }
