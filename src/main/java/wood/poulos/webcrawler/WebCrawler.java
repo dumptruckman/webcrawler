@@ -43,9 +43,6 @@ public class WebCrawler {
 
     // Starts the crawling
     void start() {
-
-        String regexp = "(http|https)://(\\w\\.)+(edu|com|gov|org)";
-
         // TODO
     }
 

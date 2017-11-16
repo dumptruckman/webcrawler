@@ -2,15 +2,23 @@ package wood.poulos.webcrawler;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.Iterator;
+import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * A abstract representation of a web page.
  */
 public class WebPage extends AbstractWebElement implements WebElement {
+
+
+    private final static Pattern LINK_AND_IMAGE_PATTERN = Pattern.compile("(?:(?:<a.*?href\\s*=\\s*(?:\"(.+?)\"|'(.+?)').*?>)|(?:<img.*?src\\s*=\\s*(?:\"(.+?)\"|'(.+?)').*?>))");
+
 
     public WebPage(URL url) {
         super(url);
@@ -20,10 +28,25 @@ public class WebPage extends AbstractWebElement implements WebElement {
      * Parses the concrete web page this WebPage represents and identifies all of its files, images, and links to other
      * pages.
      * <p>
-     *     This must be done before using this class's various getters.
+     * This must be done before using this class's various getters.
      * </p>
+     *
+     * @throws IOException If there is trouble connecting to the URL.
      */
-    void crawl() {
+    void crawl() throws IOException {
+        URLConnection conn = getURL().openConnection();
+        conn.connect();
+        Scanner input = new Scanner(conn.getInputStream());
+        while (input.hasNext(LINK_AND_IMAGE_PATTERN)) {
+            String next = input.next(LINK_AND_IMAGE_PATTERN);
+            Matcher matcher = LINK_AND_IMAGE_PATTERN.matcher(next);
+            if (!matcher.matches()) {
+                throw new IllegalStateException("Matcher failed to match");
+            }
+
+        }
+
+
         /* TODO
         This is going to require the most effort out of everything most likely. We will probably need several
         more classes to deal with this in a clean way.
@@ -69,8 +92,11 @@ public class WebPage extends AbstractWebElement implements WebElement {
         return null;
     }
 
-    /** {@inheritDoc}
-     * @param saveLocation*/
+    /**
+     * {@inheritDoc}
+     *
+     * @param saveLocation
+     */
     @Override
     public void save(Path saveLocation) {
         throw new UnsupportedOperationException("page doesn't support save");
