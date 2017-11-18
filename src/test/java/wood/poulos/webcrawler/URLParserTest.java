@@ -3,20 +3,14 @@ package wood.poulos.webcrawler;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import wood.poulos.webcrawler.util.URLCreator;
 
+import java.net.URL;
 import java.util.regex.Matcher;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class URLParserTest {
-
-    private WebPage.URLParser absoluteURLParser;
-    private WebPage.URLParser relativeURLParser;
-
-    @BeforeEach
-    void setUp() {
-        absoluteURLParser = getParser("<a href=\"http://www.google.com/\">");
-    }
 
     @NotNull
     private WebPage.URLParser getParser(@NotNull String url) {
@@ -43,5 +37,42 @@ public class URLParserTest {
         assertTrue(parser instanceof WebPage.LinkURLParser);
         parser = getParser("<img src=\"image1.gif\">");
         assertTrue(parser instanceof WebPage.ImageURLParser);
+    }
+
+    @Test
+    void testResolveURLCorrectlyResolvesRelativeURLs() throws Exception {
+        WebPage.URLParser parser;
+
+        parser = getParser("<img     src = \"/images/image1.jpg\"    >");
+        assertEquals(URLCreator.create("http://www.test.com/images/image1.jpg"),
+                parser.resolveURL(URLCreator.create("http://www.test.com/")));
+        assertEquals(URLCreator.create("http://www.test.com/images/image1.jpg"),
+                parser.resolveURL(URLCreator.create("http://www.test.com")));
+
+        parser = getParser("<img     src = \"../../../images/image1.jpg\"    >");
+        assertEquals(URLCreator.create("http://www.test.com/images/image1.jpg"),
+                parser.resolveURL(URLCreator.create("http://www.test.com/churches/testing/woo")));
+        assertEquals(URLCreator.create("http://www.test.com/images/image1.jpg"),
+                parser.resolveURL(URLCreator.create("http://www.test.com/churches/testing/woo/index.html")));
+    }
+
+    @Test
+    void testGetURLType() {
+        WebPage.URLParser parser;
+
+        parser = getParser("<img src=\"/images/image1.jpg\">");
+        assertEquals(WebPage.URLParser.URLType.IMAGE, parser.getURLType());
+
+        parser = getParser("<a href=\"/images/test.txt\">");
+        assertEquals(WebPage.URLParser.URLType.FILE, parser.getURLType());
+
+        parser = getParser("<a href=\"/images\">");
+        assertEquals(WebPage.URLParser.URLType.PAGE, parser.getURLType());
+
+        parser = getParser("<a href=\"/images/index.htm\">");
+        assertEquals(WebPage.URLParser.URLType.PAGE, parser.getURLType());
+
+        parser = getParser("<a href=\"/images/\">");
+        assertEquals(WebPage.URLParser.URLType.PAGE, parser.getURLType());
     }
 }

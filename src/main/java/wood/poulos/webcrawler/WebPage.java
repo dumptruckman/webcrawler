@@ -132,7 +132,7 @@ public class WebPage extends AbstractWebElement implements WebElement {
         }
 
         @NotNull
-        private final URI uri;
+        protected final URI uri;
 
         /**
          * Creates a new URL parser for the given string which should be a valid URI.
@@ -144,15 +144,28 @@ public class WebPage extends AbstractWebElement implements WebElement {
         }
 
         /**
-         * The type of the URL this URLParser handles.
+         * Returns the type of the URL this URLParser handles.
          *
-         * @return
+         * @return The type of the URL this URLParser handles.
          */
         @NotNull
         abstract URLType getURLType();
 
-        @NotNull URL resolveURL(@NotNull URL parent) throws URISyntaxException, MalformedURLException {
-            return parent.toURI().resolve(uri).toURL();
+        @NotNull
+        URL resolveURL(@NotNull URL parent) throws URISyntaxException, MalformedURLException {
+            URI resolved = parent.toURI().resolve(uri);
+            resolved = fixDeepRelativity(resolved);
+            return resolved.toURL();
+        }
+
+        @NotNull
+        private URI fixDeepRelativity(@NotNull URI uri) {
+            String uriString = uri.toString();
+            if (uriString.contains("../")) {
+                uriString = uriString.replace("../", "");
+                uri = URI.create(uriString);
+            }
+            return uri;
         }
 
         enum URLType {
@@ -163,19 +176,24 @@ public class WebPage extends AbstractWebElement implements WebElement {
 
     static class LinkURLParser extends URLParser {
 
-        private final static Pattern PAGE_PATTERN = Pattern.compile("<\\s*a.*?href\\s*=\\s*(?:\"|')(.*html?|.*asp?|.*cgi?|.*php?|.*?)(?:\"|')*>(.*?)<\\s*?\\/\\s*?a\\s*?>");
-
+        //private final static Pattern PAGE_PATTERN = Pattern.compile("<\\s*a.*?href\\s*=\\s*(?:\"|')(.*\\.html?|.*\\.asp|.*\\.cgi|.*\\.php|[^.]*?|.*\\/)(?:\"|').*?>");
+        private final static Pattern PAGE_PATTERN = Pattern.compile("^(.*\\.html?|.*\\.asp|.*\\.cgi|.*\\.php|[\\w\\d\\/]+|.+\\/)$");
 
         @NotNull
         private final URLType urlType;
 
-        LinkURLParser(@NotNull String urlString) {
+        private LinkURLParser(@NotNull String urlString) {
             super(urlString);
-            Matcher pageMatcher = PAGE_PATTERN.matcher(urlString);
-            if (pageMatcher.matches()) {
-                urlType = URLType.PAGE;
+            String path = uri.getPath();
+            if (path != null) {
+                Matcher pageMatcher = PAGE_PATTERN.matcher(path);
+                if (pageMatcher.find()) {
+                    urlType = URLType.PAGE;
+                } else {
+                    urlType = URLType.FILE;
+                }
             } else {
-                urlType = URLType.FILE;
+                urlType = URLType.PAGE;
             }
         }
 
@@ -188,7 +206,7 @@ public class WebPage extends AbstractWebElement implements WebElement {
 
     static class ImageURLParser extends URLParser {
 
-        ImageURLParser(@NotNull String urlString) {
+        private ImageURLParser(@NotNull String urlString) {
             super(urlString);
         }
 
