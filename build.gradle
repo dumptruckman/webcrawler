@@ -14,4 +14,13 @@ dependencies {
     compile 'commons-io:commons-io:2.6'
 
     testCompile 'org.junit.jupiter:junit-jupiter-api:5.0.1'
+    testCompile 'org.nanohttpd:nanohttpd-webserver:2.2.0'
+}
+
+test {
+    // To change the port that the testing web server will run on you can use the following
+    // property when calling gradle tasks. Default port is 8080.
+    // -DtestWebServerPort=<portnum>
+    // ex: gradle build -DtestWebServerPort=8081
+    systemProperty "testWebServerPort", System.getProperty("testWebServerPort", "8080")
 }

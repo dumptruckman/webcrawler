@@ -1,9 +1,12 @@
 package wood.poulos.webcrawler;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import wood.poulos.webcrawler.util.TestWebServer;
 import wood.poulos.webcrawler.util.URLCreator;
 
+import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Paths;
 import java.util.Collection;
@@ -13,27 +16,36 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class WebPageTest {
 
+    private static String host;
+
+    @BeforeAll
+    static void setUpWebServer() throws IOException {
+        TestWebServer server = new TestWebServer();
+        host = "http://localhost:" + server.getPort() + "/";
+        server.start();
+    }
+
     private WebPage indexPage;
 
     private Collection<WebElement> expectedImages = new HashSet<WebElement>() {{
-        add(WebElements.createWebImage(URLCreator.create("file://testPages/images/image1.png")));
-        add(WebElements.createWebImage(URLCreator.create("file://testPages/images/image2.png")));
-        add(WebElements.createWebImage(URLCreator.create("file://testPages/images/image3.png")));
+        add(WebElements.createWebImage(URLCreator.create(host + "images/image1.png")));
+        add(WebElements.createWebImage(URLCreator.create(host + "images/image2.png")));
+        add(WebElements.createWebImage(URLCreator.create(host + "images/image3.png")));
     }};
     private Collection<WebElement> expectedFiles = new HashSet<WebElement>() {{
-        add(WebElements.createWebFile(URLCreator.create("file://testPages/text_files/text_file_1.txt")));
-        add(WebElements.createWebFile(URLCreator.create("file://testPages/text_files/text_file_2.txt")));
-        add(WebElements.createWebFile(URLCreator.create("file://testPages/text_files/text_file_3.txt")));
+        add(WebElements.createWebFile(URLCreator.create(host + "text_files/text_file_1.txt")));
+        add(WebElements.createWebFile(URLCreator.create(host + "text_files/text_file_2.txt")));
+        add(WebElements.createWebFile(URLCreator.create(host + "text_files/text_file_3.txt")));
     }};
     private Collection<WebElement> expectedPages = new HashSet<WebElement>() {{
-        add(WebElements.createWebPage(URLCreator.create("file://testPages/page2.html")));
-        add(WebElements.createWebPage(URLCreator.create("file://testPages/page3.html")));
-        add(WebElements.createWebPage(URLCreator.create("file://testPages/page4.html")));
+        add(WebElements.createWebPage(URLCreator.create(host + "page2.html")));
+        add(WebElements.createWebPage(URLCreator.create(host + "page3.html")));
+        add(WebElements.createWebPage(URLCreator.create(host + "page4.html")));
     }};
 
     @BeforeEach
     void setup() throws Exception {
-        indexPage = WebElements.createWebPage(URI.create("file://testPages/index.html").toURL());
+        indexPage = WebElements.createWebPage(URI.create(host + "index.html").toURL());
     }
 
     @Test
