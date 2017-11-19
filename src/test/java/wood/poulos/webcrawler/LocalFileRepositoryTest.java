@@ -1,9 +1,16 @@
 package wood.poulos.webcrawler;
 
+import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import wood.poulos.webcrawler.util.TestWebServer;
 import wood.poulos.webcrawler.util.URLConverter;
+import wood.poulos.webcrawler.util.URLCreator;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -18,6 +25,15 @@ import static org.junit.jupiter.api.Assertions.*;
 class LocalFileRepositoryTest {
 
     static final WebElement RELIABLE_IMAGE;
+
+    private static String host;
+
+    @BeforeAll
+    static void setUpWebServer() throws IOException {
+        TestWebServer server = new TestWebServer();
+        host = "http://localhost:" + server.getPort() + "/";
+        server.start();
+    }
 
     static {
         try {
@@ -35,9 +51,13 @@ class LocalFileRepositoryTest {
 
     private Collection<WebElement> elements;
 
+    private Path tempDir;
+
     @BeforeEach
-    void setup() throws Exception {
-        repo = new LocalFileRepository(Files.createTempDirectory("."));
+    void setUp() throws Exception {
+        tempDir = Files.createTempDirectory(Paths.get("."), "tmp");
+        tempDir.toFile().deleteOnExit();
+        repo = new LocalFileRepository(tempDir);
         elements = getStagedElements(repo);
     }
 
@@ -86,5 +106,37 @@ class LocalFileRepositoryTest {
         Path currentDirectory = Paths.get(".");
         Path expectedPath = currentDirectory.resolve(URLConverter.convertToFilePath(element.getURL()));
         assertEquals(expectedPath, repo.getLocalPathForElement(element));
+    }
+
+    @Test
+    void testCommitTestImageDownloadsSuccessfully() throws IOException {
+        URL imageURL = URLCreator.create(host + "images/images1.png");
+        WebElement image = WebElements.createWebImage(imageURL);
+        repo.addElement(image);
+        repo.commit();
+        File original = new File("./testPages/images/images1.png");
+        File downloaded = tempDir.resolve(URLConverter.convertToFilePath(imageURL).toString()).toFile();
+        assertTrue(FileUtils.contentEquals(original, downloaded));
+    }
+
+    @Test
+    void testCommitTestFileDownloadsSuccessfully() throws IOException {
+        URL fileURL = URLCreator.create(host + "text_files/text_file_1.txt");
+        WebElement file = WebElements.createWebImage(fileURL);
+        repo.addElement(file);
+        repo.commit();
+        File original = new File("./testPages/text_files/text_file_1.txt");
+        File downloaded = tempDir.resolve(URLConverter.convertToFilePath(fileURL).toString()).toFile();
+        assertTrue(FileUtils.contentEquals(original, downloaded));
+    }
+
+    @Test
+    void testCommitWebPageDownloadsNothing() {
+        URL pageURL = URLCreator.create(host + "index.html");
+        WebElement page = WebElements.createWebImage(pageURL);
+        repo.addElement(page);
+        repo.commit();
+        File downloaded = tempDir.resolve(URLConverter.convertToFilePath(pageURL).toString()).toFile();
+        assertFalse(downloaded.exists());
     }
 }
