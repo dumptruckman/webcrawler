@@ -5,6 +5,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import wood.poulos.webcrawler.util.FileDownloadVerifier;
 import wood.poulos.webcrawler.util.TestWebServer;
 import wood.poulos.webcrawler.util.URLConverter;
 import wood.poulos.webcrawler.util.URLCreator;
@@ -114,9 +115,7 @@ class LocalFileRepositoryTest {
         WebElement image = WebElements.createWebImage(imageURL);
         repo.addElement(image);
         repo.commit();
-        File original = new File("./testPages/images/images1.png");
-        File downloaded = tempDir.resolve(URLConverter.convertToFilePath(imageURL).toString()).toFile();
-        assertTrue(FileUtils.contentEquals(original, downloaded));
+        assertTrue(FileDownloadVerifier.isFileDownloadedSuccessfully(imageURL, tempDir));
     }
 
     @Test
@@ -125,9 +124,7 @@ class LocalFileRepositoryTest {
         WebElement file = WebElements.createWebImage(fileURL);
         repo.addElement(file);
         repo.commit();
-        File original = new File("./testPages/text_files/text_file_1.txt");
-        File downloaded = tempDir.resolve(URLConverter.convertToFilePath(fileURL).toString()).toFile();
-        assertTrue(FileUtils.contentEquals(original, downloaded));
+        assertTrue(FileDownloadVerifier.isFileDownloadedSuccessfully(fileURL, tempDir));
     }
 
     @Test

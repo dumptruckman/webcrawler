@@ -1,16 +1,43 @@
 package wood.poulos.webcrawler;
 
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import wood.poulos.webcrawler.util.FileDownloadVerifier;
+import wood.poulos.webcrawler.util.TestWebServer;
+import wood.poulos.webcrawler.util.URLCreator;
 
+import java.io.IOException;
 import java.net.URI;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermissions;
+import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class WebCrawlerTest {
+
+    private static String host;
+
+    @BeforeAll
+    static void setUpWebServer() throws IOException {
+        TestWebServer server = new TestWebServer();
+        host = "http://localhost:" + server.getPort() + "/";
+        server.start();
+    }
+
+    private LocalFileRepository repo;
+    private Path tempDir;
+
+    @BeforeEach
+    void setUp() throws Exception {
+        tempDir = Files.createTempDirectory(Paths.get("."), "tmp");
+        tempDir.toFile().deleteOnExit();
+        repo = new LocalFileRepository(tempDir);
+    }
 
     @Test
     public void testVerifySufficientArgCount() {
@@ -79,5 +106,17 @@ class WebCrawlerTest {
             Path p = Files.createTempDirectory("tmp", PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("r-xr-x---")));
             assertThrows(IllegalArgumentException.class, () -> WebCrawler.verifyValidDownloadRepository(p));
         }
+    }
+
+    @Test
+    public void testStartTestPagesDepth1() throws IOException {
+        WebCrawler crawler = new WebCrawler(URI.create(host), 1, repo);
+        crawler.start();
+        assertTrue(FileDownloadVerifier.isFileDownloadedSuccessfully(URLCreator.create(host + "images/image1.png"), tempDir));
+        assertTrue(FileDownloadVerifier.isFileDownloadedSuccessfully(URLCreator.create(host + "images/image2.png"), tempDir));
+        assertTrue(FileDownloadVerifier.isFileDownloadedSuccessfully(URLCreator.create(host + "images/image3.png"), tempDir));
+        assertTrue(FileDownloadVerifier.isFileDownloadedSuccessfully(URLCreator.create(host + "text_files/text_file_1.txt"), tempDir));
+        assertTrue(FileDownloadVerifier.isFileDownloadedSuccessfully(URLCreator.create(host + "text_files/text_file_2.txt"), tempDir));
+        assertTrue(FileDownloadVerifier.isFileDownloadedSuccessfully(URLCreator.create(host + "text_files/text_file_3.txt"), tempDir));
     }
 }
