@@ -51,7 +51,7 @@ class WebCrawlerTest {
     }
 
     @Test
-    public void testVerifySufficientArgCount() {
+    void testVerifySufficientArgCount() {
         WebCrawler.verifySufficientArgCount(new String[] {"1", "2", "3"});
         assertThrows(IllegalArgumentException.class, () -> WebCrawler.verifySufficientArgCount(new String[] {"1", "2"}));
         assertThrows(IllegalArgumentException.class, () -> WebCrawler.verifySufficientArgCount(new String[] {"1"}));
@@ -59,19 +59,19 @@ class WebCrawlerTest {
     }
 
     @Test
-    public void testGetValidURIIllegalURIThrowsIAE() {
+    void testGetValidURIIllegalURIThrowsIAE() {
         assertThrows(IllegalArgumentException.class, () -> WebCrawler.getValidURI("c:\\"));
     }
 
     @SuppressWarnings("ConstantConditions")
     @Test
-    public void testGetValidURILegalURI() {
+    void testGetValidURILegalURI() {
         assertTrue(WebCrawler.getValidURI("https://www.google.com") instanceof URI);
         assertTrue(WebCrawler.getValidURI("c:/") instanceof URI);
     }
 
     @Test
-    public void testGetValidMaxDepthNonNumberThrowsIAE() {
+    void testGetValidMaxDepthNonNumberThrowsIAE() {
         assertThrows(IllegalArgumentException.class, () -> WebCrawler.getValidMaxDepth("asdf"));
         assertThrows(IllegalArgumentException.class, () -> WebCrawler.getValidMaxDepth("1b"));
         assertThrows(IllegalArgumentException.class, () -> WebCrawler.getValidMaxDepth("--1"));
@@ -79,40 +79,40 @@ class WebCrawlerTest {
     }
 
     @Test
-    public void testGetValidMaxDepthNegativeNumberThrowsIAE() {
+    void testGetValidMaxDepthNegativeNumberThrowsIAE() {
         assertThrows(IllegalArgumentException.class, () -> WebCrawler.getValidMaxDepth("-1"));
     }
 
     @Test
-    public void testGetValidMaxDepthZeroThrowsIAE() {
+    void testGetValidMaxDepthZeroThrowsIAE() {
         assertThrows(IllegalArgumentException.class, () -> WebCrawler.getValidMaxDepth("0"));
     }
 
     @Test
-    public void testGetValidMaxDepthValidNumbers() {
+    void testGetValidMaxDepthValidNumbers() {
         assertEquals(1, WebCrawler.getValidMaxDepth("1"));
         assertEquals(2, WebCrawler.getValidMaxDepth("2"));
         assertEquals(10, WebCrawler.getValidMaxDepth("10"));
     }
 
     @Test
-    public void testGetValidDownloadRepositoryInvalidPathThrowsIAE() {
+    void testGetValidDownloadRepositoryInvalidPathThrowsIAE() {
         assertThrows(IllegalArgumentException.class, () -> WebCrawler.getValidDownloadRepository("/\\"));
     }
 
     @Test
-    public void testGetValidDownloadRepositoryValidPath() {
+    void testGetValidDownloadRepositoryValidPath() {
         WebCrawler.getValidDownloadRepository(".");
     }
 
     @Test
-    public void testVerifyValidDownloadRepositoryNonDirectoryThrowsIAE() throws Exception {
+    void testVerifyValidDownloadRepositoryNonDirectoryThrowsIAE() throws Exception {
         Path p = Files.createTempFile(".", "tmp");
         assertThrows(IllegalArgumentException.class, () -> WebCrawler.verifyValidDownloadRepository(p));
     }
 
     @Test
-    public void testVerifyValidDownloadRepositoryNonWritableDirectoryThrowsIAE() throws Exception {
+    void testVerifyValidDownloadRepositoryNonWritableDirectoryThrowsIAE() throws Exception {
         if (FileSystems.getDefault().supportedFileAttributeViews().contains("posix")) {
             Path p = Files.createTempDirectory("tmp", PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("r-xr-x---")));
             assertThrows(IllegalArgumentException.class, () -> WebCrawler.verifyValidDownloadRepository(p));
@@ -120,14 +120,44 @@ class WebCrawlerTest {
     }
 
     @Test
-    public void testStartTestPagesDepth1() throws IOException {
+    void testStartTestPagesDepth1() throws IOException {
         WebCrawler crawler = new WebCrawler(URI.create(host), 1, repo);
         crawler.start();
-        FileDownloadVerifier.assertFileDownloadedSuccessfully(Paths.get("./testPages/images/image1.png"), URLCreator.create(host + "images/image1.png"), tempDir);
-        FileDownloadVerifier.assertFileDownloadedSuccessfully(Paths.get("./testPages/images/image2.png"), URLCreator.create(host + "images/image2.png"), tempDir);
-        FileDownloadVerifier.assertFileDownloadedSuccessfully(Paths.get("./testPages/images/image3.png"), URLCreator.create(host + "images/image3.png"), tempDir);
-        FileDownloadVerifier.assertFileDownloadedSuccessfully(Paths.get("./testPages/text_files/text_file_1.txt"), URLCreator.create(host + "text_files/text_file_1.txt"), tempDir);
-        FileDownloadVerifier.assertFileDownloadedSuccessfully(Paths.get("./testPages/text_files/text_file_2.txt"), URLCreator.create(host + "text_files/text_file_2.txt"), tempDir);
-        FileDownloadVerifier.assertFileDownloadedSuccessfully(Paths.get("./testPages/text_files/text_file_3.txt"), URLCreator.create(host + "text_files/text_file_3.txt"), tempDir);
+        for (int i = 1; i <= 3; i++) {
+            assertImageDownloaded(i);
+            assertFileDownloaded(i);
+        }
+    }
+
+    @Test
+    void testStartTestPagesDepth2() throws IOException {
+        WebCrawler crawler = new WebCrawler(URI.create(host), 2, repo);
+        crawler.start();
+        for (int i = 1; i <= 12; i++) {
+            assertImageDownloaded(i);
+            assertFileDownloaded(i);
+        }
+    }
+
+    @Test
+    void testStartTestPagesDepth3() throws IOException {
+        WebCrawler crawler = new WebCrawler(URI.create(host), 3, repo);
+        crawler.start();
+        for (int i = 1; i <= 15; i++) {
+            assertImageDownloaded(i);
+            assertFileDownloaded(i);
+        }
+    }
+
+    private void assertImageDownloaded(int imageNumber) throws IOException {
+        FileDownloadVerifier.assertFileDownloadedSuccessfully(
+                Paths.get("./testPages/images/image" + imageNumber + ".png"),
+                URLCreator.create(host + "images/image" + imageNumber + ".png"), tempDir);
+    }
+
+    private void assertFileDownloaded(int fileNumber) throws IOException {
+        FileDownloadVerifier.assertFileDownloadedSuccessfully(
+                Paths.get("./testPages/text_files/text_file_" + fileNumber + ".txt"),
+                URLCreator.create(host + "text_files/text_file_" + fileNumber + ".txt"), tempDir);
     }
 }
