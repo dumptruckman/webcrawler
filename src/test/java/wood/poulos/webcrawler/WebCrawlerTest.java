@@ -1,5 +1,6 @@
 package wood.poulos.webcrawler;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,12 +22,20 @@ import static org.junit.jupiter.api.Assertions.*;
 class WebCrawlerTest {
 
     private static String host;
+    private static TestWebServer server;
 
     @BeforeAll
     static void setUpWebServer() throws IOException {
-        TestWebServer server = new TestWebServer();
+        TestWebServer.lock.lock();
+        server = new TestWebServer();
         host = "http://localhost:" + server.getPort() + "/";
         server.start();
+    }
+
+    @AfterAll
+    static void tearDownWebServer() {
+        server.stop();
+        TestWebServer.lock.unlock();
     }
 
     private LocalFileRepository repo;

@@ -1,10 +1,7 @@
 package wood.poulos.webcrawler;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import wood.poulos.webcrawler.util.FileDownloadVerifier;
 import wood.poulos.webcrawler.util.TestWebServer;
 import wood.poulos.webcrawler.util.URLConverter;
@@ -28,12 +25,20 @@ class LocalFileRepositoryTest {
     static final WebElement RELIABLE_IMAGE;
 
     private static String host;
+    private static TestWebServer server;
 
     @BeforeAll
     static void setUpWebServer() throws IOException {
-        TestWebServer server = new TestWebServer();
+        TestWebServer.lock.lock();
+        server = new TestWebServer();
         host = "http://localhost:" + server.getPort() + "/";
         server.start();
+    }
+
+    @AfterAll
+    static void tearDownWebServer() {
+        server.stop();
+        TestWebServer.lock.unlock();
     }
 
     static {
