@@ -49,6 +49,8 @@ public class URLParserTest {
         assertTrue(parser instanceof WebPage.ImageURLParser);
         parser = getParser("img src=\"image\t\t1.gif\">");
         assertTrue(parser instanceof WebPage.ImageURLParser);
+        parser = getParser("IMG SRC=\"image\t\t1.gif\">");
+        assertTrue(parser instanceof WebPage.ImageURLParser);
     }
 
     @Test

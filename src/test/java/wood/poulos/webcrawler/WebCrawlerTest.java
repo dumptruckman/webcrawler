@@ -1,9 +1,7 @@
 package wood.poulos.webcrawler;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.*;
 import wood.poulos.webcrawler.util.FileDownloadVerifier;
 import wood.poulos.webcrawler.util.TestWebServer;
 import wood.poulos.webcrawler.util.URLCreator;
@@ -45,6 +43,11 @@ class WebCrawlerTest {
         tempDir = Files.createTempDirectory(Paths.get("."), "tmp");
         tempDir.toFile().deleteOnExit();
         repo = new LocalFileRepository(tempDir);
+    }
+
+    @AfterEach
+    void tearDown() throws Exception {
+        FileUtils.deleteDirectory(tempDir.toFile());
     }
 
     @Test

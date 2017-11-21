@@ -21,14 +21,12 @@ public class WebPage extends AbstractWebElement implements WebElement {
     /**
      * A RegEx pattern to find and differentiate links and images within HTML.
      */
-    final static Pattern LINK_AND_IMAGE_PATTERN = Pattern.compile("(?:(?:a(?:\\s+?|\\s+?[\\S\\s]*?\\s+?)href\\s*=\\s*" +
-            "(?:\"([\\S\\s]+?)\"|'([\\S\\s]+?)')[\\S\\s]*?>)|(?:img(?:\\s+?|\\s+?[\\S\\s]*?\\s+?)src\\s*=\\s*" +
-            "(?:\"([\\S\\s]+?)\"|'([\\S\\s]+?)')[\\S\\s]*?>))[\\S\\s]*");
+    final static Pattern LINK_AND_IMAGE_PATTERN = Pattern.compile("(?:(?:a(?:\\s+?|\\s+?[\\S\\s]*?\\s+?)href\\s*=\\s*(?:\"([\\S\\s]+?)\"|'([\\S\\s]+?)')[\\S\\s]*?>)|(?:img(?:\\s+?|\\s+?[\\S\\s]*?\\s+?)src\\s*=\\s*(?:\"([\\S\\s]+?)\"|'([\\S\\s]+?)')[\\S\\s]*?>))[\\S\\s]*", Pattern.CASE_INSENSITIVE);
 
     /**
      * A RegEx pattern to determine if a URL path is a page or not.
      */
-    final static Pattern PAGE_PATTERN = Pattern.compile("^(.*\\.html?|.*\\.asp|.*\\.cgi|.*\\.php|[\\w\\d\\/]+|.+\\/)$");
+    final static Pattern PAGE_PATTERN = Pattern.compile("^((?!.*\\/.*#.*)|.*\\.html?|.*\\.asp|.*\\.cgi|.*\\.php|[\\w\\d\\/]+|.+\\/)$", Pattern.CASE_INSENSITIVE);
 
     private boolean crawled = false;
 
@@ -333,6 +331,7 @@ public class WebPage extends AbstractWebElement implements WebElement {
         private LinkURLParser(@NotNull String urlString) {
             super(urlString);
             String path = uri.getPath();
+
             if (path != null) {
                 Matcher pageMatcher = PAGE_PATTERN.matcher(path);
                 if (pageMatcher.find()) {

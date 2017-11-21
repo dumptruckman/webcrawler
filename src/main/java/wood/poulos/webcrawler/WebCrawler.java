@@ -139,7 +139,11 @@ public class WebCrawler {
         if (isNonDirectory(path)) {
             throw new IllegalArgumentException("The local directory (3rd arg) must be a directory or non-existent.");
         }
-        if (!Files.isWritable(path)) {
+//        if (path.toFile().exists()) {
+//            if (!Files.isWritable())
+//        }
+        if ((path.toFile().exists() && !Files.isWritable(path))
+                || (!path.toFile().exists() && path.getParent() != null && !Files.isWritable(path.getParent()))) {
             throw new IllegalArgumentException("The local directory (3rd arg) does not have write access.");
         }
     }

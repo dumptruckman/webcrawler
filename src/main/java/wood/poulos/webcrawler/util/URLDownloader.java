@@ -23,6 +23,11 @@ public class URLDownloader {
      * @throws IOException If something goes wrong while trying to copy the contents.
      */
     public static void copyElement(URL from, Path to) throws IOException {
+        Path parentDir = to.getParent();
+        if (parentDir == null) {
+            throw new IOException(to + " has no parent directory");
+        }
+        System.out.println(parentDir.toFile().mkdirs());
         URLConnection fromCon = from.openConnection();
         fromCon.connect();
         try (InputStream inStream = fromCon.getInputStream();

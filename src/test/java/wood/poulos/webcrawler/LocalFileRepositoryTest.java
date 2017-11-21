@@ -143,7 +143,21 @@ class LocalFileRepositoryTest {
         repo.addElement(page);
         repo.commit();
         File downloaded = tempDir.resolve(URLConverter.convertToFilePath(pageURL).toString()).toFile();
-        System.out.println("Is file at " + downloaded + " ?");
         assertFalse(downloaded.exists());
+    }
+
+    @Test
+    void testCommitWebPageCreatesDownloadDirectoryIfNonExistent() throws IOException {
+        URL pageURL = URLCreator.create(host + "images/image1.png");
+        WebElement element = WebElements.createWebImage(pageURL);
+        Path tempDir = Paths.get("asdfighairgjaorgjaofgj");
+        repo = new LocalFileRepository(tempDir);
+        repo.addElement(element);
+        repo.commit();
+
+        File downloaded = tempDir.resolve(URLConverter.convertToFilePath(pageURL).toString()).toFile();
+        assertTrue(downloaded.exists());
+
+        FileUtils.deleteDirectory(tempDir.toFile());
     }
 }
