@@ -57,4 +57,11 @@ abstract class AbstractWebElement implements WebElement {
         WebElement other = (WebElement) obj;
         return other.getURL().equals(this.getURL());
     }
+
+    @Override
+    public String toString() {
+        return "WebElement{" +
+                "url=" + url +
+                '}';
+    }
 }
