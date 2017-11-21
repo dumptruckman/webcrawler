@@ -62,9 +62,13 @@ class LocalFileRepositoryTest {
     @BeforeEach
     void setUp() throws Exception {
         tempDir = Files.createTempDirectory(Paths.get("."), "tmp");
-        tempDir.toFile().deleteOnExit();
         repo = new LocalFileRepository(tempDir);
         elements = getStagedElements(repo);
+    }
+
+    @AfterEach
+    void tearDown() throws Exception {
+        FileUtils.deleteDirectory(tempDir.toFile());
     }
 
     static Collection<WebElement> getStagedElements(WebElementRepository repo) {
@@ -116,29 +120,30 @@ class LocalFileRepositoryTest {
 
     @Test
     void testCommitTestImageDownloadsSuccessfully() throws IOException {
-        URL imageURL = URLCreator.create(host + "images/images1.png");
+        URL imageURL = URLCreator.create(host + "images/image1.png");
         WebElement image = WebElements.createWebImage(imageURL);
         repo.addElement(image);
         repo.commit();
-        assertTrue(FileDownloadVerifier.isFileDownloadedSuccessfully(imageURL, tempDir));
+        FileDownloadVerifier.assertFileDownloadedSuccessfully(Paths.get("./testPages/images/image1.png"), imageURL, tempDir);
     }
 
     @Test
     void testCommitTestFileDownloadsSuccessfully() throws IOException {
         URL fileURL = URLCreator.create(host + "text_files/text_file_1.txt");
-        WebElement file = WebElements.createWebImage(fileURL);
+        WebElement file = WebElements.createWebFile(fileURL);
         repo.addElement(file);
         repo.commit();
-        assertTrue(FileDownloadVerifier.isFileDownloadedSuccessfully(fileURL, tempDir));
+        FileDownloadVerifier.assertFileDownloadedSuccessfully(Paths.get("./testPages/text_files/text_file_1.txt"), fileURL, tempDir);
     }
 
     @Test
     void testCommitWebPageDownloadsNothing() {
         URL pageURL = URLCreator.create(host + "index.html");
-        WebElement page = WebElements.createWebImage(pageURL);
+        WebElement page = WebElements.createWebPage(pageURL);
         repo.addElement(page);
         repo.commit();
         File downloaded = tempDir.resolve(URLConverter.convertToFilePath(pageURL).toString()).toFile();
+        System.out.println("Is file at " + downloaded + " ?");
         assertFalse(downloaded.exists());
     }
 }

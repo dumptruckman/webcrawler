@@ -15,7 +15,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermissions;
-import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -121,11 +120,11 @@ class WebCrawlerTest {
     public void testStartTestPagesDepth1() throws IOException {
         WebCrawler crawler = new WebCrawler(URI.create(host), 1, repo);
         crawler.start();
-        assertTrue(FileDownloadVerifier.isFileDownloadedSuccessfully(URLCreator.create(host + "images/image1.png"), tempDir));
-        assertTrue(FileDownloadVerifier.isFileDownloadedSuccessfully(URLCreator.create(host + "images/image2.png"), tempDir));
-        assertTrue(FileDownloadVerifier.isFileDownloadedSuccessfully(URLCreator.create(host + "images/image3.png"), tempDir));
-        assertTrue(FileDownloadVerifier.isFileDownloadedSuccessfully(URLCreator.create(host + "text_files/text_file_1.txt"), tempDir));
-        assertTrue(FileDownloadVerifier.isFileDownloadedSuccessfully(URLCreator.create(host + "text_files/text_file_2.txt"), tempDir));
-        assertTrue(FileDownloadVerifier.isFileDownloadedSuccessfully(URLCreator.create(host + "text_files/text_file_3.txt"), tempDir));
+        FileDownloadVerifier.assertFileDownloadedSuccessfully(Paths.get("./testPages/images/image1.png"), URLCreator.create(host + "images/image1.png"), tempDir);
+        FileDownloadVerifier.assertFileDownloadedSuccessfully(Paths.get("./testPages/images/image2.png"), URLCreator.create(host + "images/image2.png"), tempDir);
+        FileDownloadVerifier.assertFileDownloadedSuccessfully(Paths.get("./testPages/images/image3.png"), URLCreator.create(host + "images/image3.png"), tempDir);
+        FileDownloadVerifier.assertFileDownloadedSuccessfully(Paths.get("./testPages/text_files/text_file_1.txt"), URLCreator.create(host + "text_files/text_file_1.txt"), tempDir);
+        FileDownloadVerifier.assertFileDownloadedSuccessfully(Paths.get("./testPages/text_files/text_file_2.txt"), URLCreator.create(host + "text_files/text_file_2.txt"), tempDir);
+        FileDownloadVerifier.assertFileDownloadedSuccessfully(Paths.get("./testPages/text_files/text_file_3.txt"), URLCreator.create(host + "text_files/text_file_3.txt"), tempDir);
     }
 }

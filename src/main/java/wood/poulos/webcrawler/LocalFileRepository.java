@@ -67,6 +67,10 @@ public class LocalFileRepository implements WebElementRepository {
      */
     @Override
     public void commit() {
-
+        stagedElements.parallelStream().filter(e -> !(e instanceof WebPage)).forEach(e -> {
+            System.out.println("Saving: " + e + " to " + getLocalPathForElement(e));
+            e.save(getLocalPathForElement(e));
+        });
+        stagedElements.clear();
     }
 }

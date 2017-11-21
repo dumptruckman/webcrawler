@@ -26,8 +26,14 @@ public class URLDownloader {
         URLConnection fromCon = from.openConnection();
         fromCon.connect();
         try (InputStream inStream = fromCon.getInputStream();
-             OutputStream outStream = Files.newOutputStream(to)){
-            IOUtils.copy(inStream, outStream);
+             OutputStream outStream = Files.newOutputStream(to)) {
+//            int b;
+//            while ((b = inStream.read()) != -1) {
+//                System.out.println("Read " + b);
+//                outStream.write(b);
+//            }
+//            outStream.flush();
+            IOUtils.copyLarge(inStream, outStream);
         }
     }
 }
