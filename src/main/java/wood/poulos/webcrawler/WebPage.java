@@ -16,10 +16,17 @@ import java.util.regex.Pattern;
 public class WebPage extends AbstractWebElement implements WebElement {
 
 
+    /**
+     * A RegEx pattern to find and differentiate links and images within HTML.
+     */
     final static Pattern LINK_AND_IMAGE_PATTERN = Pattern.compile("(?:(?:<a.*?href\\s*=\\s*(?:\"(.+?)\"|'(.+?)').*?>)|(?:<img.*?src\\s*=\\s*(?:\"(.+?)\"|'(.+?)').*?>))");
 
-
-    public WebPage(URL url) {
+    /**
+     * Creates a WebPage object for the given URL.
+     *
+     * @param url the URL to create the WebPage for.
+     */
+    WebPage(URL url) {
         super(url);
     }
 
@@ -151,6 +158,18 @@ public class WebPage extends AbstractWebElement implements WebElement {
         @NotNull
         abstract URLType getURLType();
 
+        /**
+         * Resolves this URLParser's parsed URL against the given parent URL.
+         *
+         * If this URLParser's parsed URL is relative, it will inserted into the correct position of the given parent
+         * URL and returned as the result. If this URLParser's parsed URL is absolute, it will simply be returned.
+         *
+         * @param parent The parent URL to resolve against.
+         * @return The resolved URL.
+         * @throws URISyntaxException If either this URLParser's parsed URL or the given parent URL cannot be
+         * parsed as a valid URI.
+         * @throws MalformedURLException If either URL does not include the protocol.
+         */
         @NotNull
         URL resolveURL(@NotNull URL parent) throws URISyntaxException, MalformedURLException {
             URI resolved = parent.toURI().resolve(uri);
@@ -158,6 +177,13 @@ public class WebPage extends AbstractWebElement implements WebElement {
             return resolved.toURL();
         }
 
+        /**
+         * Fixes a bug in {@link URI#resolve(URI)} by removing an extra parent directory (../) found when resolving
+         * a URL that backs up more than 1 parent directory.
+         *
+         * @param uri The URI to fix.
+         * @return The fixed URI.
+         */
         @NotNull
         private URI fixDeepRelativity(@NotNull URI uri) {
             String uriString = uri.toString();
@@ -168,12 +194,18 @@ public class WebPage extends AbstractWebElement implements WebElement {
             return uri;
         }
 
+        /**
+         * A type to indicate what this URLParser's URL represents: another webpage, a non-page file, or an image.
+         */
         enum URLType {
             PAGE, FILE, IMAGE;
         }
 
     }
 
+    /**
+     * Provides specific parsing for non-image URLs.
+     */
     static class LinkURLParser extends URLParser {
 
         //private final static Pattern PAGE_PATTERN = Pattern.compile("<\\s*a.*?href\\s*=\\s*(?:\"|')(.*\\.html?|.*\\.asp|.*\\.cgi|.*\\.php|[^.]*?|.*\\/)(?:\"|').*?>");
@@ -197,6 +229,7 @@ public class WebPage extends AbstractWebElement implements WebElement {
             }
         }
 
+        /** {@inheritDoc} */
         @Override
         @NotNull
         URLType getURLType() {
@@ -204,12 +237,16 @@ public class WebPage extends AbstractWebElement implements WebElement {
         }
     }
 
+    /**
+     * Provides specific parsing for image URLs.
+     */
     static class ImageURLParser extends URLParser {
 
         private ImageURLParser(@NotNull String urlString) {
             super(urlString);
         }
 
+        /** {@inheritDoc} */
         @Override
         @NotNull
         URLType getURLType() {
