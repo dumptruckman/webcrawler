@@ -57,7 +57,7 @@ public class URLParserTest {
     }
 
     @Test
-    void testGetURLType() {
+    void testGetURLTypeReturnedExpectedTypeForSampleURLs() {
         WebPage.URLParser parser;
 
         parser = getParser("<img src=\"/images/image1.jpg\">");
