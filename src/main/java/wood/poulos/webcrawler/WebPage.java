@@ -1,12 +1,14 @@
 package wood.poulos.webcrawler;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.*;
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.Scanner;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,7 +21,15 @@ public class WebPage extends AbstractWebElement implements WebElement {
     /**
      * A RegEx pattern to find and differentiate links and images within HTML.
      */
-    final static Pattern LINK_AND_IMAGE_PATTERN = Pattern.compile("(?:(?:<a.*?href\\s*=\\s*(?:\"(.+?)\"|'(.+?)').*?>)|(?:<img.*?src\\s*=\\s*(?:\"(.+?)\"|'(.+?)').*?>))");
+    final static Pattern LINK_AND_IMAGE_PATTERN = Pattern.compile("(?:(?:a(?:\\s+?|\\s+?[\\S\\s]*?\\s+?)href\\s*=\\s*" +
+            "(?:\"([\\S\\s]+?)\"|'([\\S\\s]+?)')[\\S\\s]*?>)|(?:img(?:\\s+?|\\s+?[\\S\\s]*?\\s+?)src\\s*=\\s*" +
+            "(?:\"([\\S\\s]+?)\"|'([\\S\\s]+?)')[\\S\\s]*?>))[\\S\\s]*");
+
+    private boolean crawled = false;
+
+    private Collection<WebPage> webPages;
+    private Collection<WebFile> webFiles;
+    private Collection<WebImage> webImages;
 
     /**
      * Creates a WebPage object for the given URL.
@@ -40,23 +50,110 @@ public class WebPage extends AbstractWebElement implements WebElement {
      * @throws IOException If there is trouble connecting to the URL.
      */
     void crawl() throws IOException {
-        URLConnection conn = getURL().openConnection();
-        conn.connect();
-        Scanner input = new Scanner(conn.getInputStream());
-        while (input.hasNext(LINK_AND_IMAGE_PATTERN)) {
-            String next = input.next(LINK_AND_IMAGE_PATTERN);
-            Matcher matcher = LINK_AND_IMAGE_PATTERN.matcher(next);
-            if (!matcher.matches()) {
-                throw new IllegalStateException("Matcher failed to match");
-            }
-
+        if (isCrawled()) {
+            return;
         }
 
+        System.out.println("Crawling " + getURL());
 
-        /* TODO
-        This is going to require the most effort out of everything most likely. We will probably need several
-        more classes to deal with this in a clean way.
-         */
+        Set<WebPage> webPages = new HashSet<>();
+        Set<WebFile> webFiles = new HashSet<>();
+        Set<WebImage> webImages = new HashSet<>();
+
+        URLConnection conn = getURL().openConnection();
+        conn.connect();
+
+        Scanner input = new Scanner(conn.getInputStream());
+        input.useDelimiter("<");
+
+        while (true) {
+            if (skipUselessHTML(input)) {
+                while (input.hasNext(LINK_AND_IMAGE_PATTERN)) {
+                    String next = input.next(LINK_AND_IMAGE_PATTERN);
+                    System.out.println("Found relevant tag: " + next.trim());
+
+                    Matcher matcher = LINK_AND_IMAGE_PATTERN.matcher(next);
+                    if (!matcher.matches()) {
+                        throw new IllegalStateException("Matcher failed to match");
+                    }
+
+                    WebElement element = getElementFromMatchedURL(matcher);
+                    System.out.println(element);
+                    if (element != null) {
+                        addElementToAppropriateSet(element, webPages, webFiles, webImages);
+                    }
+                }
+            } else {
+                break;
+            }
+        }
+
+        this.webPages = Collections.unmodifiableCollection(webPages);
+        this.webFiles = Collections.unmodifiableCollection(webFiles);
+        this.webImages = Collections.unmodifiableCollection(webImages);
+
+        crawled = true;
+    }
+
+    /**
+     * Skips all HTML that will not match the {@link #LINK_AND_IMAGE_PATTERN} which will result in the scanner's
+     * next token being either non-existant or able to match the {@link #LINK_AND_IMAGE_PATTERN}.
+     *
+     * @param scanner The scanner that is scanning HTML data.
+     * @return True if the next token should contain the {@link #LINK_AND_IMAGE_PATTERN} or false if scanner has reached
+     * the end of the input.
+     */
+    private boolean skipUselessHTML(@NotNull Scanner scanner) {
+        while (!scanner.hasNext(LINK_AND_IMAGE_PATTERN)) {
+            if (scanner.hasNext()) {
+                scanner.next();
+            } else {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Creates an appropriate WebElement object for the given matcher. The matcher should have already matched
+     * the {@link #LINK_AND_IMAGE_PATTERN}.
+     *
+     * @param matcher the matcher which has found a potential URL that represents a WebElement to be gathered.
+     * @return The WebElement that matches the URL matched by the given matcher or null if something is wrong with the
+     * URL matched.
+     */
+    @Nullable
+    private WebElement getElementFromMatchedURL(@NotNull Matcher matcher) {
+        URLParser urlParser = URLParser.fromMatcher(matcher);
+        try {
+            URL resolvedURL = urlParser.resolveURL(getURL());
+            System.out.println("Resolved: " + resolvedURL);
+            switch (urlParser.getURLType()) {
+                case PAGE:
+                    return WebElements.createWebPage(resolvedURL);
+                case FILE:
+                    return WebElements.createWebFile(resolvedURL);
+                case IMAGE:
+                    return WebElements.createWebImage(resolvedURL);
+            }
+        } catch (URISyntaxException | MalformedURLException e) {
+            System.out.println("Could not resolve url " + urlParser.uri + " against " + getURL());
+            System.out.println(e.getMessage());
+        }
+        return null;
+    }
+
+    private void addElementToAppropriateSet(@NotNull WebElement element, @NotNull Set<WebPage> webPages,
+                                            @NotNull Set<WebFile> webFiles, @NotNull Set<WebImage> webImages) {
+        if (element instanceof WebPage) {
+            webPages.add((WebPage) element);
+        } else if (element instanceof WebFile) {
+            webFiles.add((WebFile) element);
+        } else if (element instanceof WebImage) {
+            webImages.add((WebImage) element);
+        } else {
+            throw new IllegalStateException("Unexpected WebElement type: " + element.getClass());
+        }
     }
 
     /**
@@ -65,7 +162,7 @@ public class WebPage extends AbstractWebElement implements WebElement {
      * @return True if the page has already been crawled.
      */
     boolean isCrawled() {
-        return false;
+        return crawled;
     }
 
     /**
@@ -75,7 +172,7 @@ public class WebPage extends AbstractWebElement implements WebElement {
      */
     @NotNull
     public Collection<WebImage> getImages() {
-        return null;
+        return webImages;
     }
 
     /**
@@ -85,7 +182,7 @@ public class WebPage extends AbstractWebElement implements WebElement {
      */
     @NotNull
     public Collection<WebFile> getFiles() {
-        return null;
+        return webFiles;
     }
 
     /**
@@ -95,7 +192,7 @@ public class WebPage extends AbstractWebElement implements WebElement {
      */
     @NotNull
     public Collection<WebPage> getWebPages() {
-        return null;
+        return webPages;
     }
 
     /**
@@ -106,6 +203,11 @@ public class WebPage extends AbstractWebElement implements WebElement {
     @Override
     public void save(Path saveLocation) {
         throw new UnsupportedOperationException("page doesn't support save");
+    }
+
+    @Override
+    public String toString() {
+        return "WebPage{url=" + getURL() + "}";
     }
 
     /**
@@ -128,13 +230,23 @@ public class WebPage extends AbstractWebElement implements WebElement {
             String group3 = matcher.group(3);
             String group4 = matcher.group(4);
 
-
-            if (group1 != null || group2 != null) {
-                return new LinkURLParser(group1 != null ? group1 : group2);
-            } else if (group3 != null || group4 != null) {
-                return new ImageURLParser(group3 != null ? group3 : group4);
+            String uri;
+            if (group1 != null) {
+                uri = group1.replaceAll("[\\r\\n\\t]", "");
+            } else if (group2 != null) {
+                uri = group2.replaceAll("[\\r\\n\\t]", "");
+            } else if (group3 != null) {
+                uri = group3.replaceAll("[\\r\\n\\t]", "");
+            } else if (group4 != null) {
+                uri = group4.replaceAll("[\\r\\n\\t]", "");
             } else {
                 throw new IllegalArgumentException("Matcher has all empty capture groups.");
+            }
+
+            if (group1 != null || group2 != null) {
+                return new LinkURLParser(uri);
+            } else {
+                return new ImageURLParser(uri);
             }
         }
 

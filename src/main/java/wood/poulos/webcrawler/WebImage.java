@@ -10,4 +10,9 @@ public class WebImage extends AbstractWebElement implements WebElement {
     public WebImage(URL url) {
         super(url);
     }
+
+    @Override
+    public String toString() {
+        return "WebImage{url=" + getURL() + "}";
+    }
 }

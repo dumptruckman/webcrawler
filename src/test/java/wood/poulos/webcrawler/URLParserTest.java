@@ -23,19 +23,31 @@ public class URLParserTest {
     void testFromMatcherOnVariousValidURLMatches() {
         WebPage.URLParser parser;
 
-        parser = getParser("<a href=\"http://www.google.com/\">");
+        parser = getParser("a href=\"http://www.google.com/\">");
         assertTrue(parser instanceof WebPage.LinkURLParser);
-        parser = getParser("<a href=\"http://www.google.com/index.html\">");
+        parser = getParser("a href=\"http://www.google.com/index.html\">");
         assertTrue(parser instanceof WebPage.LinkURLParser);
-        parser = getParser("<img test='' src=\"http://www.google.com/logo.png\" target='hello'>");
+        parser = getParser("img test='' src=\"http://www.google.com/logo.png\" target='hello'>");
         assertTrue(parser instanceof WebPage.ImageURLParser);
-        parser = getParser("<img     src = \"/images/image1.jpg\"    >");
+        parser = getParser("img     src = \"/images/image1.jpg\"    >");
         assertTrue(parser instanceof WebPage.ImageURLParser);
-        parser = getParser("<a href=\"/\">");
+        parser = getParser("a href=\"/\">");
         assertTrue(parser instanceof WebPage.LinkURLParser);
-        parser = getParser("<a href=\"../\">");
+        parser = getParser("a href=\"../\">");
         assertTrue(parser instanceof WebPage.LinkURLParser);
-        parser = getParser("<img src=\"image1.gif\">");
+        parser = getParser("img src=\"image1.gif\">");
+        assertTrue(parser instanceof WebPage.ImageURLParser);
+        parser = getParser("img src=\"image1.gif\">asdfasdf");
+        assertTrue(parser instanceof WebPage.ImageURLParser);
+        parser = getParser("img src=\"image1.gif\">\nsdfasdfa");
+        assertTrue(parser instanceof WebPage.ImageURLParser);
+        parser = getParser("img\nsrc=\"image1.gif\">");
+        assertTrue(parser instanceof WebPage.ImageURLParser);
+        parser = getParser("img\ntest='' \n src=\"http://www.google.com/logo.png\" target='hello'>");
+        assertTrue(parser instanceof WebPage.ImageURLParser);
+        parser = getParser("img src=\"image\n1.gif\">");
+        assertTrue(parser instanceof WebPage.ImageURLParser);
+        parser = getParser("img src=\"image\t\t1.gif\">");
         assertTrue(parser instanceof WebPage.ImageURLParser);
     }
 
@@ -43,13 +55,13 @@ public class URLParserTest {
     void testResolveURLCorrectlyResolvesRelativeURLs() throws Exception {
         WebPage.URLParser parser;
 
-        parser = getParser("<img     src = \"/images/image1.jpg\"    >");
+        parser = getParser("img     src = \"/images/image1.jpg\"    >");
         assertEquals(URLCreator.create("http://www.test.com/images/image1.jpg"),
                 parser.resolveURL(URLCreator.create("http://www.test.com/")));
         assertEquals(URLCreator.create("http://www.test.com/images/image1.jpg"),
                 parser.resolveURL(URLCreator.create("http://www.test.com")));
 
-        parser = getParser("<img     src = \"../../../images/image1.jpg\"    >");
+        parser = getParser("img     src = \"../../../images/image1.jpg\"    >");
         assertEquals(URLCreator.create("http://www.test.com/images/image1.jpg"),
                 parser.resolveURL(URLCreator.create("http://www.test.com/churches/testing/woo")));
         assertEquals(URLCreator.create("http://www.test.com/images/image1.jpg"),
@@ -60,19 +72,19 @@ public class URLParserTest {
     void testGetURLTypeReturnedExpectedTypeForSampleURLs() {
         WebPage.URLParser parser;
 
-        parser = getParser("<img src=\"/images/image1.jpg\">");
+        parser = getParser("img src=\"/images/image1.jpg\">");
         assertEquals(WebPage.URLParser.URLType.IMAGE, parser.getURLType());
 
-        parser = getParser("<a href=\"/images/test.txt\">");
+        parser = getParser("a href=\"/images/test.txt\">");
         assertEquals(WebPage.URLParser.URLType.FILE, parser.getURLType());
 
-        parser = getParser("<a href=\"/images\">");
+        parser = getParser("a href=\"/images\">");
         assertEquals(WebPage.URLParser.URLType.PAGE, parser.getURLType());
 
-        parser = getParser("<a href=\"/images/index.htm\">");
+        parser = getParser("a href=\"/images/index.htm\">");
         assertEquals(WebPage.URLParser.URLType.PAGE, parser.getURLType());
 
-        parser = getParser("<a href=\"/images/\">");
+        parser = getParser("a href=\"/images/\">");
         assertEquals(WebPage.URLParser.URLType.PAGE, parser.getURLType());
     }
 }

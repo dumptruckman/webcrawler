@@ -60,7 +60,7 @@ abstract class AbstractWebElement implements WebElement {
 
     @Override
     public String toString() {
-        return "WebElement{" +
+        return "AbstractWebElement{" +
                 "url=" + url +
                 '}';
     }

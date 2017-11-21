@@ -78,8 +78,8 @@ class WebPageTest {
     void testCrawlSingleIndexPageFindsAllImagesFilesAndPages() throws Exception {
         indexPage.crawl();
 
+        assertTrue(indexPage.getWebPages().containsAll(expectedPages));
         assertTrue(indexPage.getFiles().containsAll(expectedFiles));
         assertTrue(indexPage.getImages().containsAll(expectedImages));
-        assertTrue(indexPage.getWebPages().containsAll(expectedPages));
     }
 }
