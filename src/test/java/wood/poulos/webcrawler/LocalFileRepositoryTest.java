@@ -86,13 +86,13 @@ class LocalFileRepositoryTest {
 
     @Test
     void testAddElementsMakeGetStagedElementsNonEmpty() throws Exception {
-        repo.addElement(WebElements.createWebPage(URI.create("file://./test.index").toURL()));
+        repo.addElement(WebElements.createWebPage(URI.create("file://./test.html").toURL()));
         assertFalse(getStagedElements(repo).isEmpty());
     }
 
     @Test
     void testAddElementsMakeGetStagedElementsContainsAddedElement() throws Exception {
-        WebElement e = WebElements.createWebPage(URI.create("file://./test.index").toURL());
+        WebElement e = WebElements.createWebPage(URI.create("file://./test.html").toURL());
         repo.addElement(e);
         assertTrue(getStagedElements(repo).contains(e));
     }

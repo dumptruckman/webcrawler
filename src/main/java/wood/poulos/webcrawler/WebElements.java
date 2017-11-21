@@ -14,11 +14,16 @@ class WebElements {
      *
      * @param url the url to create a web page for.
      * @return a web page for the given url.
+     * @throws IllegalArgumentException If the given url does not point to a web page.
      */
     @NotNull
-    static WebPage createWebPage(@NotNull URL url) {
-        WebPage webPage = new WebPage(url);
-        return webPage;
+    static WebPage createWebPage(@NotNull URL url) throws IllegalArgumentException {
+        String path = url.getPath();
+        if (path.isEmpty() || WebPage.PAGE_PATTERN.matcher(path).matches()) {
+            WebPage webPage = new WebPage(url);
+            return webPage;
+        }
+        throw new IllegalArgumentException("URL does not point to a web page.");
     }
 
     /**

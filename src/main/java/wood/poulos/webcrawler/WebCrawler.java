@@ -2,6 +2,8 @@ package wood.poulos.webcrawler;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
@@ -24,7 +26,7 @@ public class WebCrawler {
         this.repository = repository;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws MalformedURLException {
         WebCrawler crawler;
         try {
             verifySufficientArgCount(args);
@@ -41,9 +43,43 @@ public class WebCrawler {
         crawler.start();
     }
 
-    // Starts the crawling
-    void start() {
-        // TODO
+    /**
+     * Crawls the web page specified by the URI passed into this WebCrawler's constructor.
+     */
+    void start() throws MalformedURLException {
+        WebPage page;
+        try {
+            page = WebElements.createWebPage(uri.toURL());
+        } catch (IllegalArgumentException e) {
+            throw new MalformedURLException("URL does not represent a web page URL.");
+        }
+
+        crawlPage(new CrawlerData(page, 0));
+        repository.commit();
+    }
+
+    void crawlPage(CrawlerData crawlerData) {
+        WebPage page = crawlerData.page;
+        if (crawlerData.depth >= maxDepth) {
+            System.out.println(page.getURL() + " is deeper than maxDepth");
+            return;
+        }
+        try {
+            page.crawl();
+        } catch (IOException e) {
+            System.out.println("Could not connect to " + page.getURL());
+        }
+        for (WebPage p : page.getWebPages()) {
+            CrawlerData data = new CrawlerData(p, crawlerData.depth + 1);
+            // Parallelize here
+            crawlPage(data);
+        }
+        for (WebImage i : page.getImages()) {
+            repository.addElement(i);
+        }
+        for (WebFile f : page.getFiles()) {
+            repository.addElement(f);
+        }
     }
 
     /**
@@ -110,5 +146,15 @@ public class WebCrawler {
 
     static boolean isNonDirectory(@NotNull Path path) {
         return Files.exists(path) && !Files.isDirectory(path);
+    }
+
+    static class CrawlerData {
+        private final WebPage page;
+        private final int depth;
+
+        public CrawlerData(WebPage page, int depth) {
+            this.page = page;
+            this.depth = depth;
+        }
     }
 }

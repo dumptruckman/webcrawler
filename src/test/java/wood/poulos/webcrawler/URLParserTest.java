@@ -86,5 +86,8 @@ public class URLParserTest {
 
         parser = getParser("a href=\"/images/\">");
         assertEquals(WebPage.URLParser.URLType.PAGE, parser.getURLType());
+
+        parser = getParser("a href=\"https://www.google.com\">");
+        assertEquals(WebPage.URLParser.URLType.PAGE, parser.getURLType());
     }
 }
