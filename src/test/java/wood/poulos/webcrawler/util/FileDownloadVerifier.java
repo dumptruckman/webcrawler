@@ -14,8 +14,8 @@ public class FileDownloadVerifier {
     public static void assertFileDownloadedSuccessfully(@NotNull Path original, @NotNull URL url, @NotNull Path tempDir) throws IOException {
         Path downloaded = tempDir.resolve(URLConverter.convertToFilePath(url));
 
-        assertTrue(original.toFile().exists(), "Original file does not exist");
-        assertTrue(downloaded.toFile().exists(), "Downloaded file does not exist");
+        assertTrue(original.toFile().exists(), "Original file does not exist: " + original);
+        assertTrue(downloaded.toFile().exists(), "Downloaded file does not exist: " + downloaded);
 
 //        try (FileInputStream originalStream = new FileInputStream(original.toFile());
 //             FileInputStream downloadedStream = new FileInputStream(downloaded.toFile())) {

@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import wood.poulos.webcrawler.util.URLDownloader;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
@@ -37,6 +38,8 @@ abstract class AbstractWebElement implements WebElement {
     public void save(Path saveLocation) {
         try {
             URLDownloader.downloadElement(getURL(), saveLocation);
+        } catch (FileNotFoundException e) {
+            System.out.println(e.getMessage() + " was not found.");
         } catch (IOException e) {
             e.printStackTrace();
         }

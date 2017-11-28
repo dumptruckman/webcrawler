@@ -9,6 +9,17 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 
 /**
  * An application for recursively crawling a web page, downloading the elements it finds on the page such as images
@@ -19,6 +30,18 @@ public class WebCrawler {
     private final URI uri;
     private final int maxDepth;
     private final WebElementRepository repository;
+
+    private final ExecutorService executorService = Executors.newCachedThreadPool(new SimpleThreadFactory());
+    private final Queue<Future<?>> crawlerQueue = new ConcurrentLinkedQueue<>();
+
+    private static class SimpleThreadFactory implements ThreadFactory {
+
+        @Override
+        public Thread newThread(@NotNull Runnable r) {
+            System.out.println("Spawning thread");
+            return new Thread(r);
+        }
+    }
 
     WebCrawler(URI uri, int maxDepth, WebElementRepository repository) {
         this.uri = uri;
@@ -73,6 +96,9 @@ public class WebCrawler {
         }
 
         crawlPage(new CrawlerData(page, 0));
+
+        waitForCrawlsToFinish();
+
         repository.commit();
     }
 
@@ -102,14 +128,24 @@ public class WebCrawler {
     private void handlePageElements(@NotNull WebPage page, int currentDepth) {
         for (WebPage p : page.getWebPages()) {
             CrawlerData data = new CrawlerData(p, currentDepth + 1);
-            // TODO Parallelize here
-            crawlPage(data);
+            crawlerQueue.add(executorService.submit(() -> crawlPage(data)));
         }
         for (WebImage i : page.getImages()) {
             repository.addElement(i);
         }
         for (WebFile f : page.getFiles()) {
             repository.addElement(f);
+        }
+    }
+
+    private void waitForCrawlsToFinish() {
+        Future<?> crawlerTask;
+        while ((crawlerTask = crawlerQueue.poll()) != null) {
+            try {
+                crawlerTask.get();
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
         }
     }
 
