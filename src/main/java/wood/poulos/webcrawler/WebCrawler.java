@@ -31,17 +31,8 @@ public class WebCrawler {
     private final int maxDepth;
     private final WebElementRepository repository;
 
-    private final ExecutorService executorService = Executors.newCachedThreadPool(new SimpleThreadFactory());
+    private final ExecutorService executorService = Executors.newCachedThreadPool();
     private final Queue<Future<?>> crawlerQueue = new ConcurrentLinkedQueue<>();
-
-    private static class SimpleThreadFactory implements ThreadFactory {
-
-        @Override
-        public Thread newThread(@NotNull Runnable r) {
-            System.out.println("Spawning thread");
-            return new Thread(r);
-        }
-    }
 
     WebCrawler(URI uri, int maxDepth, WebElementRepository repository) {
         this.uri = uri;
