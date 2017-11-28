@@ -163,9 +163,15 @@ public class WebCrawler {
     @NotNull
     static URI parseValidURL(@NotNull String arg) {
         try {
-            return URI.create(arg);
+            URI uri = URI.create(arg);
+            try {
+                WebElements.createWebPage(uri.toURL());
+            } catch (MalformedURLException e) {
+                throw new IllegalArgumentException();
+            }
+            return uri;
         } catch (IllegalArgumentException ignore) {
-            throw new IllegalArgumentException("The web address (1st arg) is not formatted correctly.");
+            throw new IllegalArgumentException("The web address (1st arg) is not formatted correctly or does not represent a web page URL.");
         }
     }
 
