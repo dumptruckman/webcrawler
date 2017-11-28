@@ -24,8 +24,13 @@ public class URLDownloader {
      * @throws IOException If something goes wrong while trying to copy the contents.
      */
     public static void downloadElement(@NotNull URL fromURL, @NotNull Path toPath) throws IOException {
-        verifyPathHasParent(toPath);
+        createParentDirsIfNonExistent(toPath);
         performCopy(openConnection(fromURL), toPath);
+    }
+
+    private static void createParentDirsIfNonExistent(@NotNull Path path) throws IOException {
+        verifyPathHasParent(path);
+        path.getParent().toFile().mkdirs();
     }
 
     private static void verifyPathHasParent(@NotNull Path path) throws IOException {
