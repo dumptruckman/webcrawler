@@ -91,5 +91,8 @@ public class URLParserTest {
 
         parser = getParser("a href=\"https://www.google.com\">");
         assertEquals(WebPage.URLParser.URLType.PAGE, parser.getURLType());
+
+        parser = getParser("a href=\"https://stackoverflow.com/questions/6916385/is-there-a-concurrent-list-in-javas-jdk\">");
+        assertEquals(WebPage.URLParser.URLType.PAGE, parser.getURLType());
     }
 }
