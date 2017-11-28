@@ -24,7 +24,7 @@ public class WebPage extends AbstractWebElement implements WebElement {
     /**
      * A RegEx pattern to determine if a URL path is a page or not.
      */
-    final static Pattern PAGE_PATTERN = Pattern.compile("^((?!.*\\/.*#.*)|.*\\.html?|.*\\.asp|.*\\.cgi|.*\\.php|[\\w\\d\\/]+|.+\\/)$", Pattern.CASE_INSENSITIVE);
+    final static Pattern PAGE_PATTERN = Pattern.compile("^((?!.*\\/.*#.*)|.*\\.html?|.*\\.aspx?|.*\\.jsp|.*\\.cgi|.*\\.php|[\\w\\d\\-~!$&'()*+,;=:@%/]+|.+\\/[^.]+)$", Pattern.CASE_INSENSITIVE);
 
     private boolean crawled = false;
 
@@ -322,8 +322,6 @@ public class WebPage extends AbstractWebElement implements WebElement {
      * Provides specific parsing for non-image URLs.
      */
     static class LinkURLParser extends URLParser {
-
-        //private final static Pattern PAGE_PATTERN = Pattern.compile("<\\s*a.*?href\\s*=\\s*(?:\"|')(.*\\.html?|.*\\.asp|.*\\.cgi|.*\\.php|[^.]*?|.*\\/)(?:\"|').*?>");
 
         @NotNull
         private final URLType urlType;
