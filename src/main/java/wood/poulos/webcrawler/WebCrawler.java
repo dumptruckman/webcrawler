@@ -26,21 +26,39 @@ public class WebCrawler {
         this.repository = repository;
     }
 
-    public static void main(String[] args) throws MalformedURLException {
+    /**
+     * Runs the web crawler for the given arguments.
+     * <p>
+     *     The first argument should be a valid URL to a website.
+     *     The second argument should be an integer greater than 0 indicating the recursive page depth to crawl.
+     *     The third argument should be the path to a local directory to download web elements to.
+     * </p>
+     *
+     * @param args the program arguments.
+     * @throws MalformedURLException
+     */
+    public static void main(String[] args) {
         WebCrawler crawler;
+
         try {
             verifySufficientArgCount(args);
 
-            URI uri = getValidURI(args[0]);
-            int maxDepth = getValidMaxDepth(args[1]);
-            WebElementRepository repository = getValidDownloadRepository(args[2]);
+            // Transform program arguments into usable objects.
+            URI uri = parseValidURL(args[0]);
+            int maxDepth = parseValidMaxDepth(args[1]);
+            WebElementRepository repository = parseValidDownloadRepository(args[2]);
 
             crawler = new WebCrawler(uri, maxDepth, repository);
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
             return;
         }
-        crawler.start();
+
+        try {
+            crawler.start();
+        } catch (MalformedURLException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     /**
@@ -58,20 +76,33 @@ public class WebCrawler {
         repository.commit();
     }
 
+    /**
+     * Recursively crawls the {@link WebPage} contained within the given crawlerData.
+     *
+     * @param crawlerData Contains the WebPage to crawl and the current depth that page is at in the overall crawl.
+     */
     void crawlPage(CrawlerData crawlerData) {
         WebPage page = crawlerData.page;
-        if (crawlerData.depth >= maxDepth) {
+        int currentDepth = crawlerData.depth;
+
+        if (currentDepth >= maxDepth) {
             System.out.println(page.getURL() + " is deeper than maxDepth");
             return;
         }
+
         try {
             page.crawl();
         } catch (IOException e) {
             System.out.println("Could not connect to " + page.getURL());
         }
+
+        handlePageElements(page, currentDepth);
+    }
+
+    private void handlePageElements(@NotNull WebPage page, int currentDepth) {
         for (WebPage p : page.getWebPages()) {
-            CrawlerData data = new CrawlerData(p, crawlerData.depth + 1);
-            // Parallelize here
+            CrawlerData data = new CrawlerData(p, currentDepth + 1);
+            // TODO Parallelize here
             crawlPage(data);
         }
         for (WebImage i : page.getImages()) {
@@ -103,7 +134,7 @@ public class WebCrawler {
     }
 
     @NotNull
-    static URI getValidURI(@NotNull String arg) {
+    static URI parseValidURL(@NotNull String arg) {
         try {
             return URI.create(arg);
         } catch (IllegalArgumentException ignore) {
@@ -111,7 +142,7 @@ public class WebCrawler {
         }
     }
 
-    static int getValidMaxDepth(@NotNull String arg) {
+    static int parseValidMaxDepth(@NotNull String arg) {
         try {
             int maxDepth = Integer.parseInt(arg);
             if (maxDepth < 1) {
@@ -124,7 +155,7 @@ public class WebCrawler {
     }
 
     @NotNull
-    static WebElementRepository getValidDownloadRepository(@NotNull String arg) {
+    static WebElementRepository parseValidDownloadRepository(@NotNull String arg) {
         try {
             Path localPath = Paths.get(arg);
             verifyValidDownloadRepository(localPath);
@@ -139,24 +170,25 @@ public class WebCrawler {
         if (isNonDirectory(path)) {
             throw new IllegalArgumentException("The local directory (3rd arg) must be a directory or non-existent.");
         }
-//        if (path.toFile().exists()) {
-//            if (!Files.isWritable())
-//        }
+
         if ((path.toFile().exists() && !Files.isWritable(path))
                 || (!path.toFile().exists() && path.getParent() != null && !Files.isWritable(path.getParent()))) {
             throw new IllegalArgumentException("The local directory (3rd arg) does not have write access.");
         }
     }
 
-    static boolean isNonDirectory(@NotNull Path path) {
+    private static boolean isNonDirectory(@NotNull Path path) {
         return Files.exists(path) && !Files.isDirectory(path);
     }
 
-    static class CrawlerData {
+    /**
+     * A simple tuple containing a {@link WebPage} and its current depth in a crawl.
+     */
+    private static class CrawlerData {
         private final WebPage page;
         private final int depth;
 
-        public CrawlerData(WebPage page, int depth) {
+        private CrawlerData(WebPage page, int depth) {
             this.page = page;
             this.depth = depth;
         }

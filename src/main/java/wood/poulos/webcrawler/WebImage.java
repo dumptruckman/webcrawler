@@ -7,10 +7,13 @@ import java.net.URL;
  */
 public class WebImage extends AbstractWebElement implements WebElement {
 
-    public WebImage(URL url) {
+    WebImage(URL url) {
         super(url);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return "WebImage{url=" + getURL() + "}";

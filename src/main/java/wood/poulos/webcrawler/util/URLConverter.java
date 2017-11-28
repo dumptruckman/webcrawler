@@ -21,11 +21,26 @@ public class URLConverter {
      */
     @NotNull
     public static Path convertToFilePath(@NotNull URL url) {
+        String simplifiedURL = simplifyURL(url);
+        String encodedURL = encodeSimplifiedURL(simplifiedURL);
+        return Paths.get(encodedURL);
+    }
+
+    @NotNull
+    private static String simplifyURL(@NotNull URL url) {
+        return url.getHost() + parseURLPort(url) + url.getPath();
+    }
+
+    @NotNull
+    private static String parseURLPort(@NotNull URL url) {
         int port = url.getPort();
-        String portString = port != -1 ? ":" + port : "";
-        String simplifiedStringForm = url.getHost() + portString + url.getPath();
+        return port != -1 ? ":" + port : "";
+    }
+
+    @NotNull
+    private static String encodeSimplifiedURL(@NotNull String simplifiedURL) {
         try {
-            return Paths.get(URLEncoder.encode(simplifiedStringForm, "UTF-8"));
+            return URLEncoder.encode(simplifiedURL, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             // Rethrow as a runtime exception this since its using a very universal encoding.
             throw new RuntimeException(e);

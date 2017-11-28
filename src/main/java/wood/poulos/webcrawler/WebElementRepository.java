@@ -4,8 +4,6 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * An abstract repository of web elements.
- *
- * TODO - This design may not work out in the end...
  */
 public interface WebElementRepository {
 
@@ -32,7 +30,8 @@ public interface WebElementRepository {
     Iterable<WebElement> getStagedElements();
 
     /**
-     * Synchronizes the contents of this repository
+     * Commits the elements in this repository. What this means will be implementation dependent, however, once
+     * committed they will no longer be held in this repository.
      */
     void commit();
 }

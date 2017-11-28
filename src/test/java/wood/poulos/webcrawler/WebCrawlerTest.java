@@ -60,49 +60,49 @@ class WebCrawlerTest {
 
     @Test
     void testGetValidURIIllegalURIThrowsIAE() {
-        assertThrows(IllegalArgumentException.class, () -> WebCrawler.getValidURI("c:\\"));
+        assertThrows(IllegalArgumentException.class, () -> WebCrawler.parseValidURL("c:\\"));
     }
 
     @SuppressWarnings("ConstantConditions")
     @Test
     void testGetValidURILegalURI() {
-        assertTrue(WebCrawler.getValidURI("https://www.google.com") instanceof URI);
-        assertTrue(WebCrawler.getValidURI("c:/") instanceof URI);
+        assertTrue(WebCrawler.parseValidURL("https://www.google.com") instanceof URI);
+        assertTrue(WebCrawler.parseValidURL("c:/") instanceof URI);
     }
 
     @Test
     void testGetValidMaxDepthNonNumberThrowsIAE() {
-        assertThrows(IllegalArgumentException.class, () -> WebCrawler.getValidMaxDepth("asdf"));
-        assertThrows(IllegalArgumentException.class, () -> WebCrawler.getValidMaxDepth("1b"));
-        assertThrows(IllegalArgumentException.class, () -> WebCrawler.getValidMaxDepth("--1"));
-        assertThrows(IllegalArgumentException.class, () -> WebCrawler.getValidMaxDepth("."));
+        assertThrows(IllegalArgumentException.class, () -> WebCrawler.parseValidMaxDepth("asdf"));
+        assertThrows(IllegalArgumentException.class, () -> WebCrawler.parseValidMaxDepth("1b"));
+        assertThrows(IllegalArgumentException.class, () -> WebCrawler.parseValidMaxDepth("--1"));
+        assertThrows(IllegalArgumentException.class, () -> WebCrawler.parseValidMaxDepth("."));
     }
 
     @Test
     void testGetValidMaxDepthNegativeNumberThrowsIAE() {
-        assertThrows(IllegalArgumentException.class, () -> WebCrawler.getValidMaxDepth("-1"));
+        assertThrows(IllegalArgumentException.class, () -> WebCrawler.parseValidMaxDepth("-1"));
     }
 
     @Test
     void testGetValidMaxDepthZeroThrowsIAE() {
-        assertThrows(IllegalArgumentException.class, () -> WebCrawler.getValidMaxDepth("0"));
+        assertThrows(IllegalArgumentException.class, () -> WebCrawler.parseValidMaxDepth("0"));
     }
 
     @Test
     void testGetValidMaxDepthValidNumbers() {
-        assertEquals(1, WebCrawler.getValidMaxDepth("1"));
-        assertEquals(2, WebCrawler.getValidMaxDepth("2"));
-        assertEquals(10, WebCrawler.getValidMaxDepth("10"));
+        assertEquals(1, WebCrawler.parseValidMaxDepth("1"));
+        assertEquals(2, WebCrawler.parseValidMaxDepth("2"));
+        assertEquals(10, WebCrawler.parseValidMaxDepth("10"));
     }
 
     @Test
     void testGetValidDownloadRepositoryInvalidPathThrowsIAE() {
-        assertThrows(IllegalArgumentException.class, () -> WebCrawler.getValidDownloadRepository("/\\"));
+        assertThrows(IllegalArgumentException.class, () -> WebCrawler.parseValidDownloadRepository("/\\"));
     }
 
     @Test
     void testGetValidDownloadRepositoryValidPath() {
-        WebCrawler.getValidDownloadRepository(".");
+        WebCrawler.parseValidDownloadRepository(".");
     }
 
     @Test

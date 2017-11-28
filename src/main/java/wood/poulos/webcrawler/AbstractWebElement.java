@@ -36,28 +36,40 @@ abstract class AbstractWebElement implements WebElement {
     @Override
     public void save(Path saveLocation) {
         try {
-            URLDownloader.copyElement(getURL(), saveLocation);
+            URLDownloader.downloadElement(getURL(), saveLocation);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
         return getURL().hashCode();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(@Nullable Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
+        }
 
-        if (!(obj instanceof WebElement))
+        if (!(obj instanceof WebElement)) {
             return false;
+        }
+
         WebElement other = (WebElement) obj;
         return other.getURL().equals(this.getURL());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return "AbstractWebElement{" +

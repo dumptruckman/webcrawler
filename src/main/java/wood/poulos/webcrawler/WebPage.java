@@ -3,9 +3,8 @@ package wood.poulos.webcrawler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.net.*;
 import java.nio.file.Path;
 import java.util.*;
@@ -16,7 +15,6 @@ import java.util.regex.Pattern;
  * A abstract representation of a web page.
  */
 public class WebPage extends AbstractWebElement implements WebElement {
-
 
     /**
      * A RegEx pattern to find and differentiate links and images within HTML.
@@ -41,122 +39,6 @@ public class WebPage extends AbstractWebElement implements WebElement {
      */
     WebPage(URL url) {
         super(url);
-    }
-
-    /**
-     * Parses the concrete web page this WebPage represents and identifies all of its files, images, and links to other
-     * pages.
-     * <p>
-     * This must be done before using this class's various getters.
-     * </p>
-     *
-     * @throws IOException If there is trouble connecting to the URL.
-     */
-    void crawl() throws IOException {
-        if (isCrawled()) {
-            return;
-        }
-
-        System.out.println("Crawling " + getURL());
-
-        Set<WebPage> webPages = new HashSet<>();
-        Set<WebFile> webFiles = new HashSet<>();
-        Set<WebImage> webImages = new HashSet<>();
-
-        URLConnection conn = getURL().openConnection();
-        conn.connect();
-
-        Scanner input = new Scanner(conn.getInputStream());
-        input.useDelimiter("<");
-
-        while (true) {
-            if (skipUselessHTML(input)) {
-                while (input.hasNext(LINK_AND_IMAGE_PATTERN)) {
-                    String next = input.next(LINK_AND_IMAGE_PATTERN);
-                    System.out.println("Found relevant tag: " + next.trim());
-
-                    Matcher matcher = LINK_AND_IMAGE_PATTERN.matcher(next);
-                    if (!matcher.matches()) {
-                        throw new IllegalStateException("Matcher failed to match");
-                    }
-
-                    WebElement element = getElementFromMatchedURL(matcher);
-                    System.out.println(element);
-                    if (element != null) {
-                        addElementToAppropriateSet(element, webPages, webFiles, webImages);
-                    }
-                }
-            } else {
-                break;
-            }
-        }
-
-        this.webPages = Collections.unmodifiableCollection(webPages);
-        this.webFiles = Collections.unmodifiableCollection(webFiles);
-        this.webImages = Collections.unmodifiableCollection(webImages);
-
-        crawled = true;
-    }
-
-    /**
-     * Skips all HTML that will not match the {@link #LINK_AND_IMAGE_PATTERN} which will result in the scanner's
-     * next token being either non-existant or able to match the {@link #LINK_AND_IMAGE_PATTERN}.
-     *
-     * @param scanner The scanner that is scanning HTML data.
-     * @return True if the next token should contain the {@link #LINK_AND_IMAGE_PATTERN} or false if scanner has reached
-     * the end of the input.
-     */
-    private boolean skipUselessHTML(@NotNull Scanner scanner) {
-        while (!scanner.hasNext(LINK_AND_IMAGE_PATTERN)) {
-            if (scanner.hasNext()) {
-                scanner.next();
-            } else {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Creates an appropriate WebElement object for the given matcher. The matcher should have already matched
-     * the {@link #LINK_AND_IMAGE_PATTERN}.
-     *
-     * @param matcher the matcher which has found a potential URL that represents a WebElement to be gathered.
-     * @return The WebElement that matches the URL matched by the given matcher or null if something is wrong with the
-     * URL matched.
-     */
-    @Nullable
-    private WebElement getElementFromMatchedURL(@NotNull Matcher matcher) {
-        URLParser urlParser = URLParser.fromMatcher(matcher);
-        try {
-            URL resolvedURL = urlParser.resolveURL(getURL());
-            System.out.println("Resolved: " + resolvedURL);
-            switch (urlParser.getURLType()) {
-                case PAGE:
-                    return WebElements.createWebPage(resolvedURL);
-                case FILE:
-                    return WebElements.createWebFile(resolvedURL);
-                case IMAGE:
-                    return WebElements.createWebImage(resolvedURL);
-            }
-        } catch (URISyntaxException | MalformedURLException e) {
-            System.out.println("Could not resolve url " + urlParser.uri + " against " + getURL());
-            System.out.println(e.getMessage());
-        }
-        return null;
-    }
-
-    private void addElementToAppropriateSet(@NotNull WebElement element, @NotNull Set<WebPage> webPages,
-                                            @NotNull Set<WebFile> webFiles, @NotNull Set<WebImage> webImages) {
-        if (element instanceof WebPage) {
-            webPages.add((WebPage) element);
-        } else if (element instanceof WebFile) {
-            webFiles.add((WebFile) element);
-        } else if (element instanceof WebImage) {
-            webImages.add((WebImage) element);
-        } else {
-            throw new IllegalStateException("Unexpected WebElement type: " + element.getClass());
-        }
     }
 
     /**
@@ -200,17 +82,135 @@ public class WebPage extends AbstractWebElement implements WebElement {
 
     /**
      * {@inheritDoc}
-     *
-     * @param saveLocation
      */
     @Override
     public void save(Path saveLocation) {
         throw new UnsupportedOperationException("page doesn't support save");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return "WebPage{url=" + getURL() + "}";
+    }
+
+    /**
+     * Parses the concrete web page this WebPage represents and identifies all of its files, images, and links to other
+     * pages.
+     * <p>
+     * This must be done before using this class's various getters.
+     * </p>
+     *
+     * @throws IOException If there is trouble connecting to the URL.
+     */
+    void crawl() throws IOException {
+        if (isCrawled()) {
+            return;
+        }
+
+        System.out.println("Crawling " + getURL());
+
+        // A triple for collecting the elements scraped from this page.
+        ElementSets elementSets = new ElementSets();
+
+        URLConnection conn = openConnection(getURL());
+        Scanner input = getConfiguredScanner(conn.getInputStream());
+
+        while (true) {
+            if (hasSkippedUselessHTML(input)) {
+                parseLinksAndImages(input, elementSets);
+            } else {
+                // EOF reached.
+                break;
+            }
+        }
+
+        // Unpack the triple into the appropriate collections.
+        this.webPages = Collections.unmodifiableCollection(elementSets.webPages);
+        this.webFiles = Collections.unmodifiableCollection(elementSets.webFiles);
+        this.webImages = Collections.unmodifiableCollection(elementSets.webImages);
+
+        crawled = true;
+    }
+
+    @NotNull
+    private URLConnection openConnection(@NotNull URL url) throws IOException {
+        URLConnection connection = url.openConnection();
+        connection.connect();
+        return connection;
+    }
+
+    private Scanner getConfiguredScanner(InputStream inputStream) {
+        Scanner scanner = new Scanner(inputStream);
+        scanner.useDelimiter("<");
+        return scanner;
+    }
+
+    /**
+     * Skips all HTML that will not match the {@link #LINK_AND_IMAGE_PATTERN} which will result in the scanner's
+     * next token being either non-existant or able to match the {@link #LINK_AND_IMAGE_PATTERN}.
+     *
+     * @param scanner The scanner that is scanning HTML data.
+     * @return True if the next token should contain the {@link #LINK_AND_IMAGE_PATTERN} or false if scanner has reached
+     * the end of the input.
+     */
+    private boolean hasSkippedUselessHTML(@NotNull Scanner scanner) {
+        while (!scanner.hasNext(LINK_AND_IMAGE_PATTERN)) {
+            if (scanner.hasNext()) {
+                scanner.next();
+            } else {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void parseLinksAndImages(@NotNull Scanner input, @NotNull ElementSets elementSets) {
+        while (input.hasNext(LINK_AND_IMAGE_PATTERN)) {
+            String next = input.next(LINK_AND_IMAGE_PATTERN);
+
+            Matcher matcher = LINK_AND_IMAGE_PATTERN.matcher(next);
+            if (!matcher.matches()) {
+                throw new IllegalStateException("Matcher failed to match");
+            }
+
+            WebElement element = getElementFromMatchedURL(matcher);
+            System.out.println(element);
+            if (element != null) {
+                elementSets.addElementToAppropriateSet(element);
+            }
+        }
+    }
+
+    /**
+     * Creates an appropriate WebElement object for the given matcher. The matcher should have already matched
+     * the {@link #LINK_AND_IMAGE_PATTERN}.
+     *
+     * @param matcher the matcher which has found a potential URL that represents a WebElement to be gathered.
+     * @return The WebElement that matches the URL matched by the given matcher or null if something is wrong with the
+     * URL matched.
+     */
+    @Nullable
+    private WebElement getElementFromMatchedURL(@NotNull Matcher matcher) {
+        URLParser urlParser = URLParser.fromMatcher(matcher);
+        try {
+            URL resolvedURL = urlParser.resolveURL(getURL());
+            System.out.println("Resolved: " + resolvedURL);
+            switch (urlParser.getURLType()) {
+                case PAGE:
+                    return WebElements.createWebPage(resolvedURL);
+                case FILE:
+                    return WebElements.createWebFile(resolvedURL);
+                case IMAGE:
+                    return WebElements.createWebImage(resolvedURL);
+            }
+        } catch (URISyntaxException | MalformedURLException e) {
+            System.out.println("Could not resolve url " + urlParser.uri + " against " + getURL());
+            System.out.println(e.getMessage());
+        }
+        return null;
     }
 
     /**
@@ -368,5 +368,26 @@ public class WebPage extends AbstractWebElement implements WebElement {
             return URLType.IMAGE;
         }
 
+    }
+
+    /**
+     * A triple for collecting all of this web page's elements during a crawl.
+     */
+    private static class ElementSets {
+        private final Set<WebPage> webPages = new HashSet<>();
+        private final Set<WebFile> webFiles = new HashSet<>();
+        private final Set<WebImage> webImages = new HashSet<>();
+
+        private void addElementToAppropriateSet(@NotNull WebElement element) {
+            if (element instanceof WebPage) {
+                webPages.add((WebPage) element);
+            } else if (element instanceof WebFile) {
+                webFiles.add((WebFile) element);
+            } else if (element instanceof WebImage) {
+                webImages.add((WebImage) element);
+            } else {
+                throw new IllegalStateException("Unexpected WebElement type: " + element.getClass());
+            }
+        }
     }
 }

@@ -1,6 +1,7 @@
 package wood.poulos.webcrawler.util;
 
 import org.apache.commons.io.IOUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,26 +19,32 @@ public class URLDownloader {
     /**
      * Copies the contents of a URL to a location on disc as given by a path.
      *
-     * @param from The URL to copy from.
-     * @param to The path to copy to.
+     * @param fromURL The URL to download from.
+     * @param toPath The path to download to.
      * @throws IOException If something goes wrong while trying to copy the contents.
      */
-    public static void copyElement(URL from, Path to) throws IOException {
-        Path parentDir = to.getParent();
+    public static void downloadElement(@NotNull URL fromURL, @NotNull Path toPath) throws IOException {
+        verifyPathHasParent(toPath);
+        performCopy(openConnection(fromURL), toPath);
+    }
+
+    private static void verifyPathHasParent(@NotNull Path path) throws IOException {
+        Path parentDir = path.getParent();
         if (parentDir == null) {
-            throw new IOException(to + " has no parent directory");
+            throw new IOException(path + " has no parent directory");
         }
-        System.out.println(parentDir.toFile().mkdirs());
-        URLConnection fromCon = from.openConnection();
-        fromCon.connect();
-        try (InputStream inStream = fromCon.getInputStream();
-             OutputStream outStream = Files.newOutputStream(to)) {
-//            int b;
-//            while ((b = inStream.read()) != -1) {
-//                System.out.println("Read " + b);
-//                outStream.write(b);
-//            }
-//            outStream.flush();
+    }
+
+    @NotNull
+    private static URLConnection openConnection(@NotNull URL url) throws IOException {
+        URLConnection connection = url.openConnection();
+        connection.connect();
+        return connection;
+    }
+
+    private static void performCopy(@NotNull URLConnection copyFrom, @NotNull Path copyTo) throws IOException {
+        try (InputStream inStream = copyFrom.getInputStream();
+             OutputStream outStream = Files.newOutputStream(copyTo)) {
             IOUtils.copyLarge(inStream, outStream);
         }
     }
