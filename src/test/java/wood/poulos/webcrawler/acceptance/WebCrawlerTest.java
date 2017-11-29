@@ -146,6 +146,6 @@ public class WebCrawlerTest {
     @Test
     void testMainValidURLButNotActualWebsiteDisplayErrorMessage() throws IOException {
         WebCrawler.main(new String[] {"http://www.asdfgaahahafha.xyz/", "1", "temp"});
-        assertEquals("The local directory (3rd arg) must be a directory or non-existent." + LS, outContent.toString());
+        assertEquals("Crawling http://www.asdfgaahahafha.xyz/" + LS + "Could not connect to http://www.asdfgaahahafha.xyz/" + LS, outContent.toString());
     }
 }

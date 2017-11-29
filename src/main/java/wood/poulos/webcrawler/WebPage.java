@@ -28,9 +28,9 @@ public class WebPage extends AbstractWebElement implements WebElement {
 
     private boolean crawled = false;
 
-    private Collection<WebPage> webPages;
-    private Collection<WebFile> webFiles;
-    private Collection<WebImage> webImages;
+    private Collection<WebPage> webPages = Collections.unmodifiableCollection(Collections.emptyList());
+    private Collection<WebFile> webFiles = Collections.unmodifiableCollection(Collections.emptyList());
+    private Collection<WebImage> webImages = Collections.unmodifiableCollection(Collections.emptyList());
 
     /**
      * Creates a WebPage object for the given URL.
