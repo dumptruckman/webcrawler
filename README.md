@@ -35,7 +35,7 @@ program only works as described for static web pages in the current version. If 
 outside site with dynamic content such as Facebook or Twitter, it will attempt to behave crawl, and may 
 run indefinitely. 
 
-## Building
+## Building 
 The program can be run as a .jar via the command line, or can be imported into an IDE. If imported
 into an IDE, the user will have to edit their configurations for the project and specify:
 
