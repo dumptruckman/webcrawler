@@ -1,4 +1,4 @@
-## Usage
+## Usage 
 The Web Crawler takes three arguments through the command line separated by a single space:
 
 1. a valid URL
