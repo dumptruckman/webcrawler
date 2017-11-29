@@ -36,15 +36,13 @@ outside site with dynamic content such as Facebook or Twitter, it will attempt t
 run indefinitely. 
 
 ## Building 
-The program can be run as a .jar via the command line, or can be imported into an IDE. If imported
-into an IDE, the user will have to edit their configurations for the project and specify:
+The program can be built as a with gradle via the terminal. To do so, specify the following in the program configurations:
 
 + The URL to be crawled
 + The max depth
 + The desired download repository
 
-To do this: open the terminal and enter the command:
+Next, open the terminal and enter the command:
 
-`gradlew clean build jar -PcrawlerUrl=<url> -PcrawlerDepth=<depth> -PcrawlerPath=<filePath>
-`
-
+`gradlew clean build jar`
+ 
