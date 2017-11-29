@@ -2,7 +2,6 @@ group 'wood.poulos.webcrawler'
 version '1.0'
 
 apply plugin: 'java'
-apply plugin: 'application'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -48,27 +47,3 @@ task fatJar(type: Jar) {
 }
 
 jar.finalizedBy fatJar
-
-mainClassName = 'wood.poulos.webcrawler.WebCrawler'
-
-run {
-    def argList = new ArrayList()
-
-    if (project.hasProperty("crawlerUrl")) {
-        argList.add(project.findProperty("crawlerUrl"))
-    } else {
-        throw new InvalidUserDataException("You must specify a url with -PcrawlerUrl=<url>")
-    }
-    if (project.hasProperty("crawlerDepth")) {
-        argList.add(project.findProperty("crawlerDepth").toString())
-    } else {
-        throw new InvalidUserDataException("You must specify a depth with -PcrawlerDepth=<depth>")
-    }
-    if (project.hasProperty("crawlerPath")) {
-        argList.add(project.findProperty("crawlerPath").toString())
-    } else {
-        throw new InvalidUserDataException("You must specify a download path with -PcrawlerPath=<path>")
-    }
-
-    args argList.toArray()
-}
