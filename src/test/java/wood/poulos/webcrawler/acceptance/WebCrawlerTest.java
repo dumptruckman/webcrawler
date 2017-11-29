@@ -3,6 +3,7 @@ package wood.poulos.webcrawler.acceptance;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.*;
 import wood.poulos.webcrawler.WebCrawler;
+import wood.poulos.webcrawler.util.TestPrintStream;
 import wood.poulos.webcrawler.util.TestWebServer;
 
 import java.io.ByteArrayOutputStream;
@@ -36,7 +37,7 @@ public class WebCrawlerTest {
     }
 
     private Path tempDir;
-    private ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+    private TestPrintStream outContent = new TestPrintStream(System.out, new ByteArrayOutputStream());
 
     @BeforeEach
     void setUp() throws Exception {
@@ -132,7 +133,19 @@ public class WebCrawlerTest {
     void testMainValidURL1stArgNaturalNumber2ndArgButInvalidPath3rdArgDisplayErrorMessage() {
         WebCrawler.main(new String[] {"http://www.test.com", "1", "\0"});
         assertEquals("The local directory (3rd arg) must be a file path." + LS, outContent.toString());
-        outContent.reset();
+    }
 
+    @Test
+    void testMainValidURL1stArgNaturalNumber2ndArgButNonDirectoryPath3rdArgDisplayErrorMessage() throws IOException {
+        Path tempFile = Files.createTempFile(null, null);
+        tempFile.toFile().deleteOnExit();
+        WebCrawler.main(new String[] {"http://www.test.com", "1", tempFile.toString()});
+        assertEquals("The local directory (3rd arg) must be a directory or non-existent." + LS, outContent.toString());
+    }
+
+    @Test
+    void testMainValidURLButNotActualWebsiteDisplayErrorMessage() throws IOException {
+        WebCrawler.main(new String[] {"http://www.asdfgaahahafha.xyz/", "1", "temp"});
+        assertEquals("The local directory (3rd arg) must be a directory or non-existent." + LS, outContent.toString());
     }
 }
