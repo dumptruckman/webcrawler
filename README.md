@@ -9,7 +9,8 @@ The Web Crawler takes three arguments through the command line separated by a si
 files to be downloaded by the crawler. 
 
 For example: 
-http://website.com 3 C://Users/user/Desktop/downloadRepo
+
+`http://website.com 3 C://Users/user/Desktop/downloadRepo`
 
 to run the program, open the command line, change to the directory
 that contains webcrawler.jar, and run the command: 
