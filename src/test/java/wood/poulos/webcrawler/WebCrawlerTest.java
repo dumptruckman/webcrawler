@@ -66,6 +66,7 @@ public class WebCrawlerTest {
     @SuppressWarnings("ConstantConditions")
     @Test
     void testGetValidURILegalURI() {
+        assertTrue(false);
         assertTrue(WebCrawler.parseValidURL("https://www.google.com") instanceof URI);
     }
 
