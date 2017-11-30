@@ -29,14 +29,11 @@ import wood.poulos.webcrawler.WebCrawler;
 import wood.poulos.webcrawler.util.FileDownloadVerifier;
 import wood.poulos.webcrawler.util.TestPrintStream;
 import wood.poulos.webcrawler.util.TestWebServer;
-import wood.poulos.webcrawler.util.URLConverter;
 import wood.poulos.webcrawler.util.URLCreator;
-import wood.poulos.webcrawler.util.URLDownloader;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -82,69 +79,69 @@ public class WebCrawlerTest {
     @Test
     void testMainNoArgsDisplayErrorMessage() {
         WebCrawler.main(new String[] {});
-        assertEquals("A web address must be specified as the first argument." + LS, outContent.getLastString());
+        assertTrue(outContent.getLastString().contains("A web address must be specified as the first argument."));
     }
 
     @Test
     void testMainAny1ArgDisplayErrorMessage() {
         WebCrawler.main(new String[] {""});
-        assertEquals("A maximum depth must be specified as the second argument." + LS, outContent.getLastString());
+        assertTrue(outContent.getLastString().contains("A maximum depth must be specified as the second argument."));
         WebCrawler.main(new String[] {"Hello"});
-        assertEquals("A maximum depth must be specified as the second argument." + LS, outContent.getLastString());
+        assertTrue(outContent.getLastString().contains("A maximum depth must be specified as the second argument."));
         WebCrawler.main(new String[] {"http://google.com/"});
-        assertEquals("A maximum depth must be specified as the second argument." + LS, outContent.getLastString());
+        assertTrue(outContent.getLastString().contains("A maximum depth must be specified as the second argument."));
     }
 
     @Test
     void testMainAny2ArgsDisplayErrorMessage() {
         WebCrawler.main(new String[] {"", ""});
-        assertEquals("A local directory must be specified as the third argument." + LS, outContent.getLastString());
+        assertTrue(outContent.getLastString().contains("A local directory must be specified as the third argument."));
         WebCrawler.main(new String[] {"Hello", ""});
-        assertEquals("A local directory must be specified as the third argument." + LS, outContent.getLastString());
+        assertTrue(outContent.getLastString().contains("A local directory must be specified as the third argument."));
         WebCrawler.main(new String[] {"http://google.com/", ""});
-        assertEquals("A local directory must be specified as the third argument." + LS, outContent.getLastString());
+        assertTrue(outContent.getLastString().contains("A local directory must be specified as the third argument."));
         WebCrawler.main(new String[] {"", "Hello"});
-        assertEquals("A local directory must be specified as the third argument." + LS, outContent.getLastString());
+        assertTrue(outContent.getLastString().contains("A local directory must be specified as the third argument."));
         WebCrawler.main(new String[] {"", "2"});
-        assertEquals("A local directory must be specified as the third argument." + LS, outContent.getLastString());
+        assertTrue(outContent.getLastString().contains("A local directory must be specified as the third argument."));
         WebCrawler.main(new String[] {"Hello", "Hello"});
-        assertEquals("A local directory must be specified as the third argument." + LS, outContent.getLastString());
+        assertTrue(outContent.getLastString().contains("A local directory must be specified as the third argument."));
         WebCrawler.main(new String[] {"Hello", "2"});
-        assertEquals("A local directory must be specified as the third argument." + LS, outContent.getLastString());
+        assertTrue(outContent.getLastString().contains("A local directory must be specified as the third argument."));
         WebCrawler.main(new String[] {"http://google.com/", "Hello"});
-        assertEquals("A local directory must be specified as the third argument." + LS, outContent.getLastString());
+        assertTrue(outContent.getLastString().contains("A local directory must be specified as the third argument."));
         WebCrawler.main(new String[] {"http://google.com/", "2"});
-        assertEquals("A local directory must be specified as the third argument." + LS, outContent.getLastString());
+        assertTrue(outContent.getLastString().contains("A local directory must be specified as the third argument."));
     }
 
     @Test
     void testMainNonURL1stArgDisplayErrorMessage() {
         WebCrawler.main(new String[] {"", "", ""});
-        assertEquals("The web address (1st arg) is not formatted correctly or does not represent a web page URL." + LS, outContent.getLastString());
+        assertTrue(outContent.getLastString().contains("The web address (1st arg) is not formatted correctly or does not represent a web page URL."));
         WebCrawler.main(new String[] {"Hello", "", ""});
-        assertEquals("The web address (1st arg) is not formatted correctly or does not represent a web page URL." + LS, outContent.getLastString());
+        assertTrue(outContent.getLastString().contains("The web address (1st arg) is not formatted correctly or does not represent a web page URL."));
         WebCrawler.main(new String[] {"google.com", "", ""});
-        assertEquals("The web address (1st arg) is not formatted correctly or does not represent a web page URL." + LS, outContent.getLastString());
+        assertTrue(outContent.getLastString().contains("The web address (1st arg) is not formatted correctly or does not represent a web page URL."));
         WebCrawler.main(new String[] {"index.html", "", ""});
-        assertEquals("The web address (1st arg) is not formatted correctly or does not represent a web page URL." + LS, outContent.getLastString());
+        assertTrue(outContent.getLastString().contains("The web address (1st arg) is not formatted correctly or does not represent a web page URL."));
     }
 
     @Test
     void testMainValidURL1stArgButNonNaturalNumber2ndArgDisplayErrorMessage() {
         WebCrawler.main(new String[] {"http://www.test.com", "", ""});
-        assertEquals("The max depth (2nd arg) must be a natural number." + LS, outContent.getLastString());
+        assertTrue(outContent.getLastString().contains("The max depth (2nd arg) must be a natural number."));
         WebCrawler.main(new String[] {"http://www.test.com", "Hello", ""});
-        assertEquals("The max depth (2nd arg) must be a natural number." + LS, outContent.getLastString());
+        assertTrue(outContent.getLastString().contains("The max depth (2nd arg) must be a natural number."));
         WebCrawler.main(new String[] {"http://www.test.com", "-1", ""});
-        assertEquals("The max depth (2nd arg) must be a natural number." + LS, outContent.getLastString());
+        assertTrue(outContent.getLastString().contains("The max depth (2nd arg) must be a natural number."));
         WebCrawler.main(new String[] {"http://www.test.com", "0", ""});
-        assertEquals("The max depth (2nd arg) must be a natural number." + LS, outContent.getLastString());
+        assertTrue(outContent.getLastString().contains("The max depth (2nd arg) must be a natural number."));
     }
 
     @Test
     void testMainValidURL1stArgNaturalNumber2ndArgButInvalidPath3rdArgDisplayErrorMessage() {
         WebCrawler.main(new String[] {"http://www.test.com", "1", "\0"});
-        assertEquals("The local directory (3rd arg) must be a file path." + LS, outContent.getLastString());
+        assertTrue(outContent.getLastString().contains("The local directory (3rd arg) must be a file path."));
     }
 
     @Test
@@ -152,13 +149,15 @@ public class WebCrawlerTest {
         Path tempFile = Files.createTempFile(null, null);
         tempFile.toFile().deleteOnExit();
         WebCrawler.main(new String[] {"http://www.test.com", "1", tempFile.toString()});
-        assertEquals("The local directory (3rd arg) must be a directory or non-existent." + LS, outContent.getLastString());
+        assertTrue(outContent.getLastString().contains("The local directory (3rd arg) must be a directory or non-existent."));
     }
 
     @Test
     void testMainValidURLButNotActualWebsiteDisplayErrorMessage() throws IOException {
         WebCrawler.main(new String[] {"http://www.asdfgaahahafha.xyz/", "1", "temp"});
-        assertEquals("Crawling page at http://www.asdfgaahahafha.xyz/" + LS + "Could not connect to url: http://www.asdfgaahahafha.xyz/" + LS, outContent.getLastString());
+        String output = outContent.getLastString();
+        assertTrue(output.contains("Crawling page at http://www.asdfgaahahafha.xyz/"));
+        assertTrue(output.contains("Could not connect to url: http://www.asdfgaahahafha.xyz/"));
     }
 
     @Test
