@@ -325,6 +325,7 @@ public class WebPage extends AbstractWebElement implements WebElement {
          * the correct position of the given parent URL and returned as the
          * result. If this URLParser's parsed URL is absolute, it will simply
          * be returned.
+         * </p>
          *
          * @param parent The parent URL to resolve against.
          * @return The resolved URL.
