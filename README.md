@@ -10,7 +10,12 @@ To build the application, simply run:
 `gradlew clean build jar`
 
 from a command line. This will create `webcrawler.jar` in the project root directory.
- 
+
+### Testing
+The unit and acceptance test suite are run along with the normal build process. However, if you wish to run this
+separately, simply run:
+
+`gradlew clean test`
 
 ## Usage 
 The Web Crawler requires the following three command line arguments.
