@@ -48,6 +48,17 @@ above, example usage would look like:
 
 `java -jar webcrawler.jar <url> <depth> <destination folder>`
 
+### Logging output
+
+By default, only a few messages will be displayed to the console while the
+crawler is running. If you would like to view more or less messages, you
+can set the log level like so:
+
+`java -DlogLevel=<level> -jar webcrawler.jar <url> <depth> <destination folder>`
+
+Where level can be either `TRACE`, `DEBUG`, or `INFO`. `TRACE` will show the
+most output while `INFO` will show the least.
+
 ## How it works
 
 The crawler works by parsing the first page of the given URL
