@@ -1,10 +1,10 @@
 package wood.poulos.webcrawler.acceptance;
 
 import org.apache.commons.io.FileUtils;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.*;
 import wood.poulos.webcrawler.WebCrawler;
-import wood.poulos.webcrawler.util.*;
+import wood.poulos.webcrawler.util.TestPrintStream;
+import wood.poulos.webcrawler.util.TestWebServer;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -147,13 +147,5 @@ public class WebCrawlerTest {
     void testMainValidURLButNotActualWebsiteDisplayErrorMessage() throws IOException {
         WebCrawler.main(new String[] {"http://www.asdfgaahahafha.xyz/", "1", "temp"});
         assertEquals("Crawling http://www.asdfgaahahafha.xyz/" + LS + "Could not connect to http://www.asdfgaahahafha.xyz/" + LS, outContent.toString());
-    }
-
-    @Test
-    void testMainValidArgs() throws IOException{
-        WebCrawler.main(new String[] {"http://classics.mit.edu/", "1", "tempDir.toString()"});
-        URLConverter.convertToFilePath(URLCreator.create("http://classics.mit.edu/Images/ICA-banner-smaller.gif"));
-        FileDownloadVerifier.assertFileDownloadedSuccessfully("classics.mit.edu%2FImages%2F1p.gif", "classics.mit.edu%2FImages%2F1p.gif", "tempDir.toString()");
-        assertEquals("classics.mit.edu%2FImages%2F1p.gif", "classics.mit.edu%2FImages%2F1p.gif", "The first image was downloaded ");
     }
 }
