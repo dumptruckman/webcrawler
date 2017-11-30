@@ -1,7 +1,12 @@
+plugins {
+    id 'net.minecrell.licenser' version '0.3'
+}
+
 group 'wood.poulos.webcrawler'
 version '1.0'
 
 apply plugin: 'java'
+apply plugin: 'net.minecrell.licenser'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -52,3 +57,9 @@ task fatJar(type: Jar) {
 }
 
 jar.finalizedBy fatJar
+
+license {
+    header project.file('LICENSE.txt')
+    include '**/*.java'
+    newLine false
+}
