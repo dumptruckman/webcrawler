@@ -7,7 +7,7 @@ The program can be built simply with gradle via the terminal. No additional inst
 
 To build the application, simply run:
 
-`gradlew clean build jar`
+`gradlew clean build`
 
 from a command line. This will create `webcrawler.jar` in the project root directory.
 
@@ -16,6 +16,15 @@ The unit and acceptance test suite are run along with the normal build process. 
 separately, simply run:
 
 `gradlew clean test`
+
+**NOTE** Running the test suite launchers a web server on the default port of 8081. If this port is not
+open, the tests will fail. To change this port you must add the following system property to the build:
+
+`-DtestWebServerPort=<portnum>`
+
+Example:
+
+`gradle clean build -DtestWebServerPort=8083`
 
 ## Usage 
 The Web Crawler requires the following three command line arguments.
