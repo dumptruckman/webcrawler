@@ -67,7 +67,6 @@ public class WebCrawlerTest {
     @Test
     void testGetValidURILegalURI() {
         assertTrue(WebCrawler.parseValidURL("https://www.google.com") instanceof URI);
-        assertTrue(WebCrawler.parseValidURL("c:/") instanceof URI);
     }
 
     @Test
