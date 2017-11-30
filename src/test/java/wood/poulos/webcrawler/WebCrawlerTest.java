@@ -16,7 +16,7 @@ import java.nio.file.attribute.PosixFilePermissions;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class WebCrawlerTest {
+public class WebCrawlerTest {
 
     private static String host;
     private static TestWebServer server;
@@ -124,8 +124,8 @@ class WebCrawlerTest {
         WebCrawler crawler = new WebCrawler(URI.create(host), 1, repo);
         crawler.start();
         for (int i = 1; i <= 3; i++) {
-            assertImageDownloaded(i);
-            assertFileDownloaded(i);
+            assertImageDownloaded(i, tempDir, host);
+            assertFileDownloaded(i, tempDir, host);
         }
     }
 
@@ -134,8 +134,8 @@ class WebCrawlerTest {
         WebCrawler crawler = new WebCrawler(URI.create(host), 2, repo);
         crawler.start();
         for (int i = 1; i <= 12; i++) {
-            assertImageDownloaded(i);
-            assertFileDownloaded(i);
+            assertImageDownloaded(i, tempDir, host);
+            assertFileDownloaded(i, tempDir, host);
         }
     }
 
@@ -144,18 +144,18 @@ class WebCrawlerTest {
         WebCrawler crawler = new WebCrawler(URI.create(host), 3, repo);
         crawler.start();
         for (int i = 1; i <= 15; i++) {
-            assertImageDownloaded(i);
-            assertFileDownloaded(i);
+            assertImageDownloaded(i, tempDir, host);
+            assertFileDownloaded(i, tempDir, host);
         }
     }
 
-    private void assertImageDownloaded(int imageNumber) throws IOException {
+    public static void assertImageDownloaded(int imageNumber, Path tempDir, String host) throws IOException {
         FileDownloadVerifier.assertFileDownloadedSuccessfully(
                 Paths.get("./testPages/images/image" + imageNumber + ".png"),
                 URLCreator.create(host + "images/image" + imageNumber + ".png"), tempDir);
     }
 
-    private void assertFileDownloaded(int fileNumber) throws IOException {
+    public static void assertFileDownloaded(int fileNumber, Path tempDir, String host) throws IOException {
         FileDownloadVerifier.assertFileDownloadedSuccessfully(
                 Paths.get("./testPages/text_files/text_file_" + fileNumber + ".txt"),
                 URLCreator.create(host + "text_files/text_file_" + fileNumber + ".txt"), tempDir);

@@ -3,12 +3,17 @@ package wood.poulos.webcrawler.acceptance;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.*;
 import wood.poulos.webcrawler.WebCrawler;
+import wood.poulos.webcrawler.util.FileDownloadVerifier;
 import wood.poulos.webcrawler.util.TestPrintStream;
 import wood.poulos.webcrawler.util.TestWebServer;
+import wood.poulos.webcrawler.util.URLConverter;
+import wood.poulos.webcrawler.util.URLCreator;
+import wood.poulos.webcrawler.util.URLDownloader;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -131,5 +136,28 @@ public class WebCrawlerTest {
     void testMainValidURLButNotActualWebsiteDisplayErrorMessage() throws IOException {
         WebCrawler.main(new String[] {"http://www.asdfgaahahafha.xyz/", "1", "temp"});
         assertEquals("Crawling page at http://www.asdfgaahahafha.xyz/" + LS + "Could not connect to url: http://www.asdfgaahahafha.xyz/" + LS, outContent.getLastString());
+    }
+
+    @Test
+    void testMainTrustySiteDepth1DownloadsAllFilesAndImagesOnPage() throws Exception {
+        WebCrawler.main(new String[] {"http://classics.mit.edu/", "1", tempDir.toString()});
+        FileDownloadVerifier.assertFileDownloadedSuccessfully(URLCreator.create("http://classics.mit.edu/Images/ICA-banner-smaller.gif"), tempDir);
+        FileDownloadVerifier.assertFileDownloadedSuccessfully(URLCreator.create("http://classics.mit.edu/Images/1p.gif"), tempDir);
+        FileDownloadVerifier.assertFileDownloadedSuccessfully(URLCreator.create("http://classics.mit.edu/Images/browse-icon.gif"), tempDir);
+        FileDownloadVerifier.assertFileDownloadedSuccessfully(URLCreator.create("http://classics.mit.edu/Images/buy-icon.gif"), tempDir);
+        FileDownloadVerifier.assertFileDownloadedSuccessfully(URLCreator.create("http://classics.mit.edu/Images/help-icon.gif"), tempDir);
+        FileDownloadVerifier.assertFileDownloadedSuccessfully(URLCreator.create("http://classics.mit.edu/Images/links-icon.gif"), tempDir);
+        FileDownloadVerifier.assertFileDownloadedSuccessfully(URLCreator.create("http://classics.mit.edu/Images/macmade.gif"), tempDir);
+        FileDownloadVerifier.assertFileDownloadedSuccessfully(URLCreator.create("http://classics.mit.edu/Images/search-icon.gif"), tempDir);
+        FileDownloadVerifier.assertFileDownloadedSuccessfully(URLCreator.create("http://classics.mit.edu/Images/wa-small.gif"), tempDir);
+    }
+
+    @Test
+    void testMainLocalSiteDepth3DownalodsAllFilesAndImagesOnAllReachablePages() throws IOException {
+        WebCrawler.main(new String[] {host, "3", tempDir.toString()});
+        for (int i = 1; i <= 15; i++) {
+            wood.poulos.webcrawler.WebCrawlerTest.assertImageDownloaded(i, tempDir, host);
+            wood.poulos.webcrawler.WebCrawlerTest.assertFileDownloaded(i, tempDir, host);
+        }
     }
 }
