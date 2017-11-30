@@ -73,6 +73,7 @@ public class WebCrawler {
         } catch (MalformedURLException e) {
             System.out.println(e.getMessage());
         }
+        System.out.println("Main done");
     }
 
     /**
@@ -130,6 +131,7 @@ public class WebCrawler {
     }
 
     private void waitForCrawlsToFinish() {
+        System.out.println("Waiting for crawls");
         Future<?> crawlerTask;
         while ((crawlerTask = crawlerQueue.poll()) != null) {
             try {
@@ -138,6 +140,8 @@ public class WebCrawler {
                 e.printStackTrace();
             }
         }
+        System.out.println("Crawls finished");
+        executorService.shutdown();
     }
 
     /**

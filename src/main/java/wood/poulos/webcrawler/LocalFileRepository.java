@@ -79,6 +79,7 @@ public class LocalFileRepository implements WebElementRepository {
      */
     @Override
     public void commit() {
+        System.out.println("Downloading files");
         stagedElements.parallelStream()
                 .filter(e -> !(e instanceof WebPage))
                 .forEach(e -> {
@@ -86,5 +87,6 @@ public class LocalFileRepository implements WebElementRepository {
                     e.save(getLocalPathForElement(e));
                 });
         stagedElements.clear();
+        System.out.println("Files downloaded");
     }
 }
