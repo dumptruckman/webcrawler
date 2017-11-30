@@ -2,6 +2,8 @@ package wood.poulos.webcrawler;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,6 +17,8 @@ import java.util.regex.Pattern;
  * A abstract representation of a web page.
  */
 public class WebPage extends AbstractWebElement implements WebElement {
+
+    private static final Logger logger = LoggerFactory.getLogger(WebCrawler.class);
 
     /**
      * A RegEx pattern to find and differentiate links and images within HTML.
@@ -110,7 +114,7 @@ public class WebPage extends AbstractWebElement implements WebElement {
             return;
         }
 
-        System.out.println("Crawling " + getURL());
+        logger.trace("Crawling {}", getURL());
 
         // A triple for collecting the elements scraped from this page.
         ElementSets elementSets = new ElementSets();
@@ -177,7 +181,6 @@ public class WebPage extends AbstractWebElement implements WebElement {
             }
 
             WebElement element = getElementFromMatchedURL(matcher);
-            System.out.println(element);
             if (element != null) {
                 elementSets.addElementToAppropriateSet(element);
             }
@@ -197,7 +200,7 @@ public class WebPage extends AbstractWebElement implements WebElement {
         URLParser urlParser = URLParser.fromMatcher(matcher);
         try {
             URL resolvedURL = urlParser.resolveURL(getURL());
-            System.out.println("Resolved: " + resolvedURL);
+            logger.trace("Resolved: {}", resolvedURL);
             switch (urlParser.getURLType()) {
                 case PAGE:
                     return WebElements.createWebPage(resolvedURL);
@@ -207,8 +210,8 @@ public class WebPage extends AbstractWebElement implements WebElement {
                     return WebElements.createWebImage(resolvedURL);
             }
         } catch (URISyntaxException | MalformedURLException e) {
-            System.out.println("Could not resolve url " + urlParser.uri + " against " + getURL());
-            System.out.println(e.getMessage());
+            logger.warn("Could not resolve url {} against {}", urlParser.uri, getURL());
+            logger.warn(e.getMessage());
         }
         return null;
     }

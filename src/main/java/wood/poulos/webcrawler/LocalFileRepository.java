@@ -2,6 +2,8 @@ package wood.poulos.webcrawler;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import wood.poulos.webcrawler.util.URLConverter;
 
 import java.nio.file.Path;
@@ -13,6 +15,9 @@ import java.util.Set;
  * constructor {@link #LocalFileRepository(Path)}.
  */
 public class LocalFileRepository implements WebElementRepository {
+
+    private static final Logger logger = LoggerFactory.getLogger(WebCrawler.class);
+
     private final Path localPath;
     private final Set<WebElement> stagedElements = new HashSet<>();
 
@@ -79,14 +84,14 @@ public class LocalFileRepository implements WebElementRepository {
      */
     @Override
     public void commit() {
-        System.out.println("Downloading files");
+        logger.info("Begin downloading...");
         stagedElements.parallelStream()
                 .filter(e -> !(e instanceof WebPage))
                 .forEach(e -> {
-                    System.out.println("Saving: " + e + " to " + getLocalPathForElement(e));
+                    logger.trace("Saving {} to {}", e, getLocalPathForElement(e));
                     e.save(getLocalPathForElement(e));
                 });
         stagedElements.clear();
-        System.out.println("Files downloaded");
+        logger.info("Done downloading.");
     }
 }

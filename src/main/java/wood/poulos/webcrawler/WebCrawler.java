@@ -1,6 +1,8 @@
 package wood.poulos.webcrawler;
 
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -9,23 +11,20 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Queue;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
 
 /**
  * An application for recursively crawling a web page, downloading the elements it finds on the page such as images
  * and files.
  */
 public class WebCrawler {
+
+    private static final Logger logger = LoggerFactory.getLogger(WebCrawler.class);
 
     private final URI uri;
     private final int maxDepth;
@@ -64,16 +63,15 @@ public class WebCrawler {
 
             crawler = new WebCrawler(uri, maxDepth, repository);
         } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage());
             return;
         }
 
         try {
             crawler.start();
         } catch (MalformedURLException e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage());
         }
-        System.out.println("Main done");
     }
 
     /**
@@ -104,14 +102,15 @@ public class WebCrawler {
         int currentDepth = crawlerData.depth;
 
         if (currentDepth >= maxDepth) {
-            System.out.println(page.getURL() + " is deeper than maxDepth");
+            logger.trace("{} is deeper than maxDepth", page.getURL());
             return;
         }
 
         try {
+            logger.info("Crawling page at {}", page.getURL());
             page.crawl();
         } catch (IOException e) {
-            System.out.println("Could not connect to " + page.getURL());
+            logger.warn("Could not connect to url: {}", page.getURL());
         }
 
         handlePageElements(page, currentDepth);
@@ -131,7 +130,7 @@ public class WebCrawler {
     }
 
     private void waitForCrawlsToFinish() {
-        System.out.println("Waiting for crawls");
+        logger.debug("Waiting for crawling to finish");
         Future<?> crawlerTask;
         while ((crawlerTask = crawlerQueue.poll()) != null) {
             try {
@@ -140,7 +139,8 @@ public class WebCrawler {
                 e.printStackTrace();
             }
         }
-        System.out.println("Crawls finished");
+        logger.info("Done crawling.");
+        //System.out.println("Crawls finished");
         executorService.shutdown();
     }
 
