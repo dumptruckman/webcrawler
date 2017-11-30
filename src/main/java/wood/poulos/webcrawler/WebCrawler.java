@@ -85,7 +85,12 @@ public class WebCrawler {
             throw new MalformedURLException("URL does not represent a web page URL.");
         }
 
-        crawlPage(new CrawlerData(page, 0));
+        try {
+            crawlPage(new CrawlerData(page, 0));
+        } catch (IllegalArgumentException e) {
+            logger.error(e.getMessage());
+            return;
+        }
 
         waitForCrawlsToFinish();
 
@@ -110,7 +115,11 @@ public class WebCrawler {
             logger.info("Crawling page at {}", page.getURL());
             page.crawl();
         } catch (IOException e) {
-            logger.warn("Could not connect to url: {}", page.getURL());
+            if (currentDepth == 0) {
+                throw new IllegalArgumentException("Could not connect to url: " + page.getURL());
+            } else {
+                logger.warn("Could not connect to url: {}", page.getURL());
+            }
         }
 
         handlePageElements(page, currentDepth);
@@ -140,7 +149,6 @@ public class WebCrawler {
             }
         }
         logger.info("Done crawling.");
-        //System.out.println("Crawls finished");
         executorService.shutdown();
     }
 
