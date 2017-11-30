@@ -37,7 +37,8 @@ import java.nio.file.Paths;
 public class URLConverter {
 
     /**
-     * Converts the given URL into a path that is suitable for any popular file system.
+     * Converts the given URL into a path that is suitable for any popular file
+     * system.
      *
      * @param url The URL to convert.
      * @return A valid path for any popular file system.

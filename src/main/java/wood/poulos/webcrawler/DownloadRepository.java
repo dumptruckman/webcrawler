@@ -30,9 +30,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
- * A singleton version of {@link LocalFileRepository}. Commits WebElements by downloading them to a directory specified
- * by {@link #setDownloadLocation(Path)}. If no download directory is specified, the files will be downloaded to the
- * current working directory.
+ * A singleton version of {@link LocalFileRepository}. Commits WebElements by
+ * downloading them to a directory specified by
+ * {@link #setDownloadLocation(Path)}. If no download directory is specified,
+ * the files will be downloaded to the current working directory.
  */
 enum DownloadRepository implements WebElementRepository {
     /**
@@ -62,11 +63,13 @@ enum DownloadRepository implements WebElementRepository {
     /**
      * Retrieves the path on the local disk for the given element.
      * <p>
-     *     This path will be based on the url of the element and the download location of this repository.
+     * This path will be based on the url of the element and the download
+     * location of this repository.
      * </p>
      *
      * @param element The element to get the path for.
-     * @return The local path for the given element or null if the element is not contained within this repository.
+     * @return The local path for the given element or null if the element is
+     * not contained within this repository.
      */
     @Nullable
     Path getLocalPathForElement(@NotNull WebElement element) {

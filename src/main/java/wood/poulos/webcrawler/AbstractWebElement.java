@@ -35,7 +35,8 @@ import java.net.URL;
 import java.nio.file.Path;
 
 /**
- * Simple implementation of WebElement for the parts that are consistent across all web elements.
+ * Simple implementation of WebElement for the parts that are consistent across
+ * all web elements.
  */
 abstract class AbstractWebElement implements WebElement {
 

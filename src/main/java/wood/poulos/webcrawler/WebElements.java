@@ -37,7 +37,8 @@ class WebElements {
      *
      * @param url the url to create a web page for.
      * @return a web page for the given url.
-     * @throws IllegalArgumentException If the given url does not point to a web page.
+     * @throws IllegalArgumentException If the given url does not point to a web
+     * page.
      */
     @NotNull
     static WebPage createWebPage(@NotNull URL url) throws IllegalArgumentException {

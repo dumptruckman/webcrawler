@@ -34,8 +34,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * A repository of {@link WebElement}s that will commit elements by downloading them to the path specified in the
- * constructor {@link #LocalFileRepository(Path)}.
+ * A repository of {@link WebElement}s that will commit elements by downloading
+ * them to the path specified in the constructor
+ * {@link #LocalFileRepository(Path)}.
  */
 public class LocalFileRepository implements WebElementRepository {
 
@@ -45,7 +46,8 @@ public class LocalFileRepository implements WebElementRepository {
     private final Set<WebElement> stagedElements = new HashSet<>();
 
     /**
-     * Constructs a LocalFileRepository with the given localPath download location.
+     * Constructs a LocalFileRepository with the given localPath download
+     * location.
      *
      * @param localPath The path to download web elements to when committed.
      */
@@ -66,11 +68,13 @@ public class LocalFileRepository implements WebElementRepository {
     /**
      * Retrieves the path on the local disk for the given element.
      * <p>
-     *     This path will be based on the url of the element and the download location of this repository.
+     * This path will be based on the url of the element and the download
+     * location of this repository.
      * </p>
      *
      * @param element The element to get the path for.
-     * @return The local path for the given element or null if the element is not contained within this repository.
+     * @return The local path for the given element or null if the element is
+     * not contained within this repository.
      */
     @Nullable
     public Path getLocalPathForElement(@NotNull WebElement element) {

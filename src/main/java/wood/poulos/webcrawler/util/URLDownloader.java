@@ -43,8 +43,9 @@ public class URLDownloader {
      * Copies the contents of a URL to a location on disc as given by a path.
      *
      * @param fromURL The URL to download from.
-     * @param toPath The path to download to.
-     * @throws IOException If something goes wrong while trying to copy the contents.
+     * @param toPath  The path to download to.
+     * @throws IOException If something goes wrong while trying to copy the
+     *                     contents.
      */
     public static void downloadElement(@NotNull URL fromURL, @NotNull Path toPath) throws IOException {
         createParentDirsIfNonExistent(toPath);

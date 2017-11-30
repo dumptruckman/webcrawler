@@ -30,9 +30,17 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.*;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Scanner;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -98,9 +106,11 @@ public class WebPage extends AbstractWebElement implements WebElement {
     }
 
     /**
-     * Returns an unmodifiable collection of the links to other web pages located on this page.
+     * Returns an unmodifiable collection of the links to other web pages
+     * located on this page.
      *
-     * @return an unmodifiable collection of the links to other web pages located on this page.
+     * @return an unmodifiable collection of the links to other web pages
+     * located on this page.
      */
     @NotNull
     public Collection<WebPage> getWebPages() {
@@ -124,8 +134,8 @@ public class WebPage extends AbstractWebElement implements WebElement {
     }
 
     /**
-     * Parses the concrete web page this WebPage represents and identifies all of its files, images, and links to other
-     * pages.
+     * Parses the concrete web page this WebPage represents and identifies all
+     * of its files, images, and links to other pages.
      * <p>
      * This must be done before using this class's various getters.
      * </p>
@@ -176,12 +186,14 @@ public class WebPage extends AbstractWebElement implements WebElement {
     }
 
     /**
-     * Skips all HTML that will not match the {@link #LINK_AND_IMAGE_PATTERN} which will result in the scanner's
-     * next token being either non-existant or able to match the {@link #LINK_AND_IMAGE_PATTERN}.
+     * Skips all HTML that will not match the {@link #LINK_AND_IMAGE_PATTERN}
+     * which will result in the scanner's next token being either non-existant
+     * or able to match the {@link #LINK_AND_IMAGE_PATTERN}.
      *
      * @param scanner The scanner that is scanning HTML data.
-     * @return True if the next token should contain the {@link #LINK_AND_IMAGE_PATTERN} or false if scanner has reached
-     * the end of the input.
+     * @return True if the next token should contain the
+     * {@link #LINK_AND_IMAGE_PATTERN} or false if scanner has reached the end
+     * of the input.
      */
     private boolean hasSkippedUselessHTML(@NotNull Scanner scanner) {
         while (!scanner.hasNext(LINK_AND_IMAGE_PATTERN)) {
@@ -211,12 +223,13 @@ public class WebPage extends AbstractWebElement implements WebElement {
     }
 
     /**
-     * Creates an appropriate WebElement object for the given matcher. The matcher should have already matched
-     * the {@link #LINK_AND_IMAGE_PATTERN}.
+     * Creates an appropriate WebElement object for the given matcher. The
+     * matcher should have already matched the {@link #LINK_AND_IMAGE_PATTERN}.
      *
-     * @param matcher the matcher which has found a potential URL that represents a WebElement to be gathered.
-     * @return The WebElement that matches the URL matched by the given matcher or null if something is wrong with the
-     * URL matched.
+     * @param matcher the matcher which has found a potential URL that
+     *                represents a WebElement to be gathered.
+     * @return The WebElement that matches the URL matched by the given matcher
+     * or null if something is wrong with the URL matched.
      */
     @Nullable
     private WebElement getElementFromMatchedURL(@NotNull Matcher matcher) {
@@ -240,16 +253,21 @@ public class WebPage extends AbstractWebElement implements WebElement {
     }
 
     /**
-     * An internal utility for differentiating regex matches of URLs into the 3 relevant types: Page, File and Image.
+     * An internal utility for differentiating regex matches of URLs into the 3
+     * relevant types: Page, File and Image.
      */
     abstract static class URLParser {
 
         /**
-         * Creates a an appropriate type of URLParser to parse the URL from the given matcher.
+         * Creates a an appropriate type of URLParser to parse the URL from the
+         * given matcher.
          * <p>
-         *     The given matcher must have already matched the pattern {@link WebPage#LINK_AND_IMAGE_PATTERN}.
+         * The given matcher must have already matched the pattern
+         * {@link WebPage#LINK_AND_IMAGE_PATTERN}.
          * </p>
-         * @param matcher The matcher than will be parsed into an appropriate URL.
+         *
+         * @param matcher The matcher than will be parsed into an appropriate
+         *                URL.
          * @return A new URLParse of the appropriate type.
          */
         @NotNull
@@ -283,7 +301,8 @@ public class WebPage extends AbstractWebElement implements WebElement {
         protected final URI uri;
 
         /**
-         * Creates a new URL parser for the given string which should be a valid URI.
+         * Creates a new URL parser for the given string which should be a
+         * valid URI.
          *
          * @param urlString The URL string.
          */
@@ -301,15 +320,19 @@ public class WebPage extends AbstractWebElement implements WebElement {
 
         /**
          * Resolves this URLParser's parsed URL against the given parent URL.
-         *
-         * If this URLParser's parsed URL is relative, it will inserted into the correct position of the given parent
-         * URL and returned as the result. If this URLParser's parsed URL is absolute, it will simply be returned.
+         * <p>
+         * If this URLParser's parsed URL is relative, it will inserted into
+         * the correct position of the given parent URL and returned as the
+         * result. If this URLParser's parsed URL is absolute, it will simply
+         * be returned.
          *
          * @param parent The parent URL to resolve against.
          * @return The resolved URL.
-         * @throws URISyntaxException If either this URLParser's parsed URL or the given parent URL cannot be
-         * parsed as a valid URI.
-         * @throws MalformedURLException If either URL does not include the protocol.
+         * @throws URISyntaxException    If either this URLParser's parsed URL
+         *                               or the given parent URL cannot be
+         *                               parsed as a valid URI.
+         * @throws MalformedURLException If either URL does not include the
+         *                               protocol.
          */
         @NotNull
         URL resolveURL(@NotNull URL parent) throws URISyntaxException, MalformedURLException {
@@ -319,8 +342,9 @@ public class WebPage extends AbstractWebElement implements WebElement {
         }
 
         /**
-         * Fixes a bug in {@link URI#resolve(URI)} by removing an extra parent directory (../) found when resolving
-         * a URL that backs up more than 1 parent directory.
+         * Fixes a bug in {@link URI#resolve(URI)} by removing an extra parent
+         * directory (../) found when resolving a URL that backs up more than
+         * 1 parent directory.
          *
          * @param uri The URI to fix.
          * @return The fixed URI.
@@ -336,7 +360,8 @@ public class WebPage extends AbstractWebElement implements WebElement {
         }
 
         /**
-         * A type to indicate what this URLParser's URL represents: another webpage, a non-page file, or an image.
+         * A type to indicate what this URLParser's URL represents: another
+         * webpage, a non-page file, or an image.
          */
         enum URLType {
             PAGE, FILE, IMAGE;
@@ -368,7 +393,9 @@ public class WebPage extends AbstractWebElement implements WebElement {
             }
         }
 
-        /** {@inheritDoc} */
+        /**
+         * {@inheritDoc}
+         */
         @Override
         @NotNull
         URLType getURLType() {
@@ -385,7 +412,9 @@ public class WebPage extends AbstractWebElement implements WebElement {
             super(urlString);
         }
 
-        /** {@inheritDoc} */
+        /**
+         * {@inheritDoc}
+         */
         @Override
         @NotNull
         URLType getURLType() {
@@ -398,6 +427,7 @@ public class WebPage extends AbstractWebElement implements WebElement {
      * A triple for collecting all of this web page's elements during a crawl.
      */
     private static class ElementSets {
+
         private final Set<WebPage> webPages = new HashSet<>();
         private final Set<WebFile> webFiles = new HashSet<>();
         private final Set<WebImage> webImages = new HashSet<>();

@@ -42,8 +42,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 /**
- * An application for recursively crawling a web page, downloading the elements it finds on the page such as images
- * and files.
+ * An application for recursively crawling a web page, downloading the elements
+ * it finds on the page such as images and files.
  */
 public class WebCrawler {
 
@@ -65,9 +65,10 @@ public class WebCrawler {
     /**
      * Runs the web crawler for the given arguments.
      * <p>
-     *     The first argument should be a valid URL to a website.
-     *     The second argument should be an integer greater than 0 indicating the recursive page depth to crawl.
-     *     The third argument should be the path to a local directory to download web elements to.
+     * The first argument should be a valid URL to a website. The second
+     * argument should be an integer greater than 0 indicating the recursive
+     * page depth to crawl. The third argument should be the path to a local
+     * directory to download web elements to.
      * </p>
      *
      * @param args the program arguments.
@@ -98,7 +99,8 @@ public class WebCrawler {
     }
 
     /**
-     * Crawls the web page specified by the URI passed into this WebCrawler's constructor.
+     * Crawls the web page specified by the URI passed into this WebCrawler's
+     * constructor.
      */
     void start() throws MalformedURLException {
         WebPage page;
@@ -121,9 +123,11 @@ public class WebCrawler {
     }
 
     /**
-     * Recursively crawls the {@link WebPage} contained within the given crawlerData.
+     * Recursively crawls the {@link WebPage} contained within the given
+     * crawlerData.
      *
-     * @param crawlerData Contains the WebPage to crawl and the current depth that page is at in the overall crawl.
+     * @param crawlerData Contains the WebPage to crawl and the current depth
+     *                    that page is at in the overall crawl.
      */
     void crawlPage(CrawlerData crawlerData) {
         WebPage page = crawlerData.page;
@@ -176,7 +180,8 @@ public class WebCrawler {
     }
 
     /**
-     * The repository where this web crawler will store the web elements it locates.
+     * The repository where this web crawler will store the web elements it
+     * locates.
      *
      * @return this web crawler's element repository.
      */
@@ -250,9 +255,11 @@ public class WebCrawler {
     }
 
     /**
-     * A simple tuple containing a {@link WebPage} and its current depth in a crawl.
+     * A simple tuple containing a {@link WebPage} and its current depth in a
+     * crawl.
      */
     private static class CrawlerData {
+
         private final WebPage page;
         private final int depth;
 
