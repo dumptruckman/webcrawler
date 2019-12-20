@@ -81,4 +81,3 @@ to the specified depth for the given website. Note that this program only works
 as described for static web pages in the current version. Behavior on dynamic
 sites such as Facebook and Twitter is undefined.
 
-
